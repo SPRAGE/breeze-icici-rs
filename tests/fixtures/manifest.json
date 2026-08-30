@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "source": {
+    "documentation_url": "https://api.icicidirect.com/breezeapi/documents/index.html",
+    "retrieved_at": "2026-08-29T16:18:00+05:30",
+    "sha256": "943a65f477efb1ad594efaed9b239066618f023ea4ab346a34841a90a29ec47e",
+    "official_python_sdk_url": "https://github.com/Idirect-Tech/Breeze-Python-SDK",
+    "official_python_sdk_version": "1.0.68",
+    "official_python_sdk_commit": "4125106b48932ff99b45d593749dcec21c552558"
+  },
+  "documented_limits": {
+    "rest_calls_per_minute": 100,
+    "rest_calls_per_day": 5000,
+    "combined_order_mutations_per_second": 10,
+    "timestamp_skew_seconds": 60,
+    "stream_scripts": 2000
+  },
+  "required_markdown": [
+    "README.md",
+    "CHANGELOG.md",
+    "docs/PROJECT_BRIEF.md",
+    "docs/ARCHITECTURE.md",
+    "docs/API_COVERAGE.md",
+    "docs/DOCUMENTATION_AUDIT.md",
+    "docs/TEST_STRATEGY.md",
+    "docs/IMPLEMENTATION_PLAN.md",
+    "docs/SECURITY.md",
+    "docs/KNOWN_LIMITATIONS.md"
+  ],
+  "rest_operations": [
+    {"id":"auth.customer_details","section":"CustomerDetails / CustomerDetails","method":"GET","base":"rest_v1","path":"/customerdetails","auth":"session_exchange","response_fixture":"auth.customer_details"},
+    {"id":"account.demat_holdings","section":"DematHoldings / GetDematHoldings","method":"GET","base":"rest_v1","path":"/dematholdings","auth":"signed_v1","response_fixture":"account.demat_holdings"},
+    {"id":"account.get_funds","section":"Funds / GetFunds","method":"GET","base":"rest_v1","path":"/funds","auth":"signed_v1","response_fixture":"account.get_funds"},
+    {"id":"account.set_funds","section":"Funds / SetFunds","method":"POST","base":"rest_v1","path":"/funds","auth":"signed_v1","response_fixture":"account.set_funds"},
+    {"id":"market.historical_v1","section":"HistoricalCharts / GetHistoricalChartsList","method":"GET","base":"rest_v1","path":"/historicalcharts","auth":"signed_v1","response_fixture":"market.historical_v1"},
+    {"id":"risk.margin_calculator","section":"Margin Calculator / margin calculator","method":"POST","base":"rest_v1","path":"/margincalculator","auth":"signed_v1","response_fixture":"risk.margin_calculator"},
+    {"id":"account.get_margin","section":"Margin / GetMargins","method":"GET","base":"rest_v1","path":"/margin","auth":"signed_v1","response_fixture":"account.get_margin"},
+    {"id":"orders.place","section":"Order / OrderPlacement","method":"POST","base":"rest_v1","path":"/order","auth":"signed_v1","response_fixture":"orders.place"},
+    {"id":"orders.detail","section":"Order / GetOrderDetail","method":"GET","base":"rest_v1","path":"/order","auth":"signed_v1","response_fixture":"orders.detail"},
+    {"id":"orders.list","section":"Order / GetOrderList","method":"GET","base":"rest_v1","path":"/order","auth":"signed_v1","response_fixture":"orders.list"},
+    {"id":"orders.cancel","section":"Order / OrderCancellation","method":"DELETE","base":"rest_v1","path":"/order","auth":"signed_v1","response_fixture":"orders.cancel"},
+    {"id":"orders.modify","section":"Order / OrderModification","method":"PUT","base":"rest_v1","path":"/order","auth":"signed_v1","response_fixture":"orders.modify"},
+    {"id":"risk.limit_price","section":"Breeze Limit price calculation / limit calculator","method":"POST","base":"rest_v1","path":"/fnolmtpriceandqtycal","auth":"signed_v1","response_fixture":"risk.limit_price"},
+    {"id":"portfolio.holdings","section":"PortfolioHoldings / GetPortfolioHoldings","method":"GET","base":"rest_v1","path":"/portfolioholdings","auth":"signed_v1","response_fixture":"portfolio.holdings"},
+    {"id":"portfolio.positions","section":"PortfolioPositions / GetPortfolioPositions","method":"GET","base":"rest_v1","path":"/portfoliopositions","auth":"signed_v1","response_fixture":"portfolio.positions"},
+    {"id":"market.quotes","section":"Quotes / GetQuotes","method":"GET","base":"rest_v1","path":"/quotes","auth":"signed_v1","response_fixture":"market.quotes"},
+    {"id":"orders.square_off","section":"SquareOff / SquareOff","method":"POST","base":"rest_v1","path":"/squareoff","auth":"signed_v1","response_fixture":"orders.square_off"},
+    {"id":"trades.list","section":"Trades / GetTradeList","method":"GET","base":"rest_v1","path":"/trades","auth":"signed_v1","response_fixture":"trades.list"},
+    {"id":"trades.detail","section":"Trades / GetTradeDetail","method":"GET","base":"rest_v1","path":"/trades","auth":"signed_v1","response_fixture":"trades.detail"},
+    {"id":"market.option_chain","section":"OptionChain / GetOptionChain","method":"GET","base":"rest_v1","path":"/optionchain","auth":"signed_v1","response_fixture":"market.option_chain"},
+    {"id":"orders.preview_equity","section":"Preview Order / GetBrokeragecharges - Equity","method":"GET","base":"rest_v1","path":"/preview_order","auth":"signed_v1","response_fixture":"orders.preview_equity"},
+    {"id":"orders.preview_fno","section":"Preview Order / GetBrokeragecharges - Fno","method":"GET","base":"rest_v1","path":"/preview_order","auth":"signed_v1","response_fixture":"orders.preview_fno"},
+    {"id":"market.historical_v2","section":"HistoricalChartsv2 / GetHistoricalCharts","method":"GET","base":"rest_v2","path":"/historicalcharts","auth":"session_v2","response_fixture":"market.historical_v2"},
+    {"id":"gtt.place","section":"GTTOrder / GTTOrderPlacement","method":"POST","base":"rest_v1","path":"/gttorder","auth":"signed_v1","response_fixture":"gtt.place"},
+    {"id":"gtt.list","section":"GTTOrder / GTTOrderBook","method":"GET","base":"rest_v1","path":"/gttorder","auth":"signed_v1","response_fixture":"gtt.list"},
+    {"id":"gtt.cancel","section":"GTTOrder / GTTCancelOrder","method":"DELETE","base":"rest_v1","path":"/gttorder","auth":"signed_v1","response_fixture":"gtt.cancel"},
+    {"id":"gtt.modify","section":"GTTOrder / GTTModifyOrder","method":"PUT","base":"rest_v1","path":"/gttorder","auth":"signed_v1","response_fixture":"gtt.modify"}
+  ],
+  "streams": [
+    {"id":"stream.orders","section":"Order Notifications / live feeds for Order Updates","url":"https://livefeeds.icicidirect.com/","socketio_path":"/socket.io","event":"order","fixture":"order_cash"},
+    {"id":"stream.market_data","section":"Tick Data Stream / Tick By Tick Market Data","url":"https://livestream.icicidirect.com/","socketio_path":"/socket.io","event":"stock","fixture":"quote_nse"},
+    {"id":"stream.one_click_fno","section":"One Click F&O Stream / Oneclick Strategy","url":"https://livefeeds.icicidirect.com/","socketio_path":"/socket.io","event":"stock","fixture":"one_click_fno"},
+    {"id":"stream.one_click_equity","section":"One Click Equity Stream / Oneclick Equity Strategy(iclick_2_gain)","url":"https://livefeeds.icicidirect.com/","socketio_path":"/socket.io","event":"stock","fixture":"one_click_equity"},
+    {"id":"stream.candles","section":"Candle Stream / Candle Data LIVE(StreamLiveOHLCV)","url":"https://breezeapi.icicidirect.com/","socketio_path":"/ohlcvstream","event":"1SEC","fixture":"candle_equity"}
+  ]
+}

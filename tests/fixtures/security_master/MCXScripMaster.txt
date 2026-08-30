@@ -1,0 +1,2 @@
+"Token","InstrumentName","ShortName","Series","CompanyName","TickSize","LotSize","ExpiryDate","OptionType","StrikePrice","StartDate","EndDate","ExpiryMonth","MarketLot","MarginPercentage","LowerCktLimit","UpperCktLimit","OpenInterest","LifeTimeLow","LifeTimeHigh","LowPriceRange","HighPriceRange","QuantityUnit","PriceUnit","DeliveryUnit","Exchange","ExchangeCode"
+"4001","FUTSTK","ZINC","FUTURE","ZINC",5,5,"31-Dec-2026","XX",0,"","","",5,10,300,400,12500,100,500,326,353.1,"MT","RS/1KGS","MT","MCX","ZINC"

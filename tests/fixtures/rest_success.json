@@ -1,0 +1,466 @@
+{
+  "auth.customer_details": {
+    "Success": {
+      "exg_trade_date": {"NSE":"17-Apr-2025","BSE":"17-Apr-2025","FNO":"17-Apr-2025","NDX":"17-Apr-2025"},
+      "exg_status": {"NSE":"O","BSE":"O","FNO":"Y","NDX":"O"},
+      "segments_allowed": {"Trading":"Y","Equity":"Y","Derivatives":"Y","Currency":"Z"},
+      "idirect_userid": "USER-TEST",
+      "session_token": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA==",
+      "idirect_user_name": "TEST USER",
+      "idirect_ORD_TYP": "N",
+      "idirect_lastlogin_time": "17-Apr-2025 11:50:42",
+      "mf_holding_mode_popup_flg": "N",
+      "commodity_exchange_status": "N",
+      "commodity_trade_date": "17-Apr-2025",
+      "commodity_allowed": "O"
+    },
+    "Status": 200,
+    "Error": null
+  },
+  "account.demat_holdings": {
+    "Success": [{
+      "stock_code": "UNITEC",
+      "stock_ISIN": "INE000TEST001",
+      "quantity": "1",
+      "demat_total_bulk_quantity": "1",
+      "demat_avail_quantity": "0",
+      "blocked_quantity": "0",
+      "demat_allocated_quantity": "1"
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "account.get_funds": {
+    "Success": {
+      "bank_account": "ACCOUNT-REDACTED",
+      "total_bank_balance": 800000.0,
+      "allocated_equity": 200000.0,
+      "allocated_fno": 200000.0,
+      "allocated_commodity": 200000.0,
+      "allocated_currency": 200000.0,
+      "block_by_trade_equity": 0.0,
+      "block_by_trade_fno": 12500.53,
+      "block_by_trade_commodity": 0.0,
+      "block_by_trade_currency": 0.0,
+      "block_by_trade_balance": 15500,
+      "unallocated_balance": "87500"
+    },
+    "Status": 200,
+    "Error": null
+  },
+  "account.set_funds": {
+    "Success": {"status":"Success"},
+    "Status": 200,
+    "Error": null
+  },
+  "market.historical_v1": {
+    "Success": [{
+      "datetime": "2025-02-03 09:21:00",
+      "stock_code": "ITC",
+      "exchange_code": "NSE",
+      "product_type": null,
+      "expiry_date": null,
+      "right": null,
+      "strike_price": null,
+      "open": "419.85",
+      "high": "420.75",
+      "low": "418.95",
+      "close": "419.95",
+      "volume": "1951",
+      "open_interest": null,
+      "count": 7
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "risk.margin_calculator": {
+    "Success": {
+      "margin_calulation": [{
+        "strike_price": "0",
+        "quantity": "75",
+        "right": "Others",
+        "product": "Futures",
+        "action": "Buy",
+        "price": "23400",
+        "expiry_date": "27-Feb-2025",
+        "stock_code": "NIFTY"
+      }],
+      "non_span_margin_required": "0",
+      "order_value": "493011.26",
+      "order_margin": "0",
+      "trade_margin": null,
+      "block_trade_margin": "0",
+      "span_margin_required": "493011.26"
+    },
+    "Status": 200,
+    "Error": null
+  },
+  "account.get_margin": {
+    "Success": {
+      "limit_list": [],
+      "cash_limit": 1000000.0,
+      "amount_allocated": 100000.0,
+      "block_by_trade": 0.0,
+      "isec_margin": 0.0
+    },
+    "Status": 200,
+    "Error": null
+  },
+  "orders.place": {
+    "Success": {"order_id":"ORDER-TEST-1","message":"Successfully Placed the order","user_remark":"rustsdk"},
+    "Status": 200,
+    "Error": null
+  },
+  "orders.detail": {
+    "Success": [{
+      "order_id": "ORDER-TEST-1",
+      "exchange_order_id": null,
+      "exchange_code": "NSE",
+      "stock_code": "ITC",
+      "product_type": "Cash",
+      "action": "Buy",
+      "order_type": "Limit",
+      "stoploss": "0.00",
+      "quantity": "1",
+      "price": "420.00",
+      "validity": "Day",
+      "disclosed_quantity": "0",
+      "expiry_date": null,
+      "right": null,
+      "strike_price": 0.0,
+      "average_price": "0",
+      "cancelled_quantity": "0",
+      "pending_quantity": "1",
+      "status": "Ordered",
+      "user_remark": "rustsdk",
+      "order_datetime": "05-Feb-2025 09:26",
+      "parent_order_id": null,
+      "modification_number": null,
+      "exchange_acknowledgement_date": null,
+      "SLTP_price": null,
+      "exchange_acknowledge_number": null,
+      "initial_limit": null,
+      "intial_sltp": null,
+      "LTP": null,
+      "limit_offset": null,
+      "mbc_flag": null,
+      "cutoff_price": null,
+      "validity_date": ""
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "orders.list": {
+    "Success": [{
+      "order_id": "ORDER-TEST-1",
+      "exchange_order_id": null,
+      "exchange_code": "NSE",
+      "stock_code": "ITC",
+      "product_type": "Cash",
+      "action": "Buy",
+      "order_type": "Limit",
+      "stoploss": "0.00",
+      "quantity": "1",
+      "price": "420.00",
+      "validity": "Day",
+      "disclosed_quantity": "0",
+      "expiry_date": null,
+      "right": null,
+      "strike_price": 0.0,
+      "average_price": "0",
+      "cancelled_quantity": "0",
+      "pending_quantity": "1",
+      "status": "Ordered",
+      "user_remark": "rustsdk",
+      "order_datetime": "05-Feb-2025 09:26",
+      "parent_order_id": null,
+      "modification_number": null,
+      "exchange_acknowledgement_date": null,
+      "SLTP_price": null,
+      "exchange_acknowledge_number": null,
+      "initial_limit": null,
+      "intial_sltp": null,
+      "LTP": null,
+      "limit_offset": null,
+      "mbc_flag": null,
+      "cutoff_price": null,
+      "validity_date": ""
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "orders.cancel": {
+    "Success": {"order_id":"ORDER-TEST-1","message":"Your Order Canceled successfully."},
+    "Status": 200,
+    "Error": null
+  },
+  "orders.modify": {
+    "Success": {"message":"Successfully Modified the order","order_id":"ORDER-TEST-1"},
+    "Status": 200,
+    "Error": null
+  },
+  "risk.limit_price": {
+    "Success": {"available_quantity":"75","action_id":"0","order_margin":"0","limit_rate":"6.00"},
+    "Status": 200,
+    "Error": null
+  },
+  "portfolio.holdings": {
+    "Success": [{
+      "stock_code": "NIFTY",
+      "exchange_code": "NFO",
+      "quantity": "0",
+      "average_price": "0",
+      "booked_profit_loss": null,
+      "current_market_price": "0",
+      "change_percentage": null,
+      "answer_flag": null,
+      "product_type": "Options",
+      "expiry_date": "27-Feb-2025",
+      "strike_price": "24000",
+      "right": "Call",
+      "category_index_per_stock": "I",
+      "action": "NA",
+      "realized_profit": "-349.26",
+      "unrealized_profit": "0",
+      "open_position_value": "0",
+      "portfolio_charges": "5.51"
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "portfolio.positions": {
+    "Success": [{
+      "segment": "fno",
+      "product_type": "Options",
+      "exchange_code": "NFO",
+      "stock_code": "NIFTY",
+      "expiry_date": "27-Feb-2025",
+      "strike_price": "24000",
+      "right": "Call",
+      "action": "NA",
+      "quantity": "0",
+      "average_price": "0",
+      "settlement_id": null,
+      "margin_amount": null,
+      "ltp": "29.95",
+      "price": "28.85",
+      "stock_index_indicator": "Index",
+      "cover_quantity": "0",
+      "stoploss_trigger": "0",
+      "stoploss": null,
+      "take_profit": null,
+      "available_margin": null,
+      "squareoff_mode": null,
+      "mtf_sell_quantity": null,
+      "mtf_net_amount_payable": null,
+      "mtf_expiry_date": null,
+      "order_id": "",
+      "cover_order_flow": null,
+      "cover_order_executed_quantity": null,
+      "pledge_status": null,
+      "pnl": null,
+      "underlying": "NIFTY",
+      "order_segment_code": null
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "market.quotes": {
+    "Success": [{
+      "exchange_code": "NFO",
+      "product_type": "Future",
+      "stock_code": "NIFTY",
+      "expiry_date": "27-Feb-2025",
+      "right": "*",
+      "strike_price": 0.0,
+      "ltp": 23832.85,
+      "ltt": "05-Feb-2025 09:36:56",
+      "best_bid_price": 23832.0,
+      "best_bid_quantity": "1500",
+      "best_offer_price": 23833.8,
+      "best_offer_quantity": "150",
+      "open": 23825.0,
+      "high": 23840.6,
+      "low": 23808.0,
+      "previous_close": 23785.4,
+      "ltp_percent_change": 0.2,
+      "upper_circuit": 26163.95,
+      "lower_circuit": 21406.9,
+      "total_quantity_traded": "623325",
+      "spot_price": "23783.7"
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "orders.square_off": {
+    "Success": {"order_id":"ORDER-TEST-2","message":"Successfully Placed the order","indicator":"0"},
+    "Status": 200,
+    "Error": null
+  },
+  "trades.list": {
+    "Success": [{
+      "book_type": "Trade-Book",
+      "trade_date": "05-Feb-2025",
+      "stock_code": "ITC",
+      "action": "Buy",
+      "quantity": "1",
+      "average_cost": "420.20",
+      "brokerage_amount": "0.00",
+      "product_type": "limit",
+      "exchange_code": "NSE",
+      "order_id": "ORDER-TEST-1",
+      "segment": "M",
+      "settlement_code": "SETTLEMENT-TEST",
+      "dp_id": "DP-REDACTED",
+      "client_id": "CLIENT-REDACTED",
+      "ltp": "419.95",
+      "eatm_withheld_amount": "0.00",
+      "cash_withheld_amount": "0.00",
+      "total_taxes": "0.00",
+      "order_type": "limit",
+      "expiry_date": null,
+      "right": null,
+      "strike_price": null
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "trades.detail": {
+    "Success": [{
+      "settlement_id": "SETTLEMENT-TEST",
+      "exchange_trade_id": "EXCHANGE-TRADE-TEST",
+      "executed_quantity": "1",
+      "action": "B",
+      "total_transaction_cost": "0",
+      "brokerage_amount": "0",
+      "taxes": "0",
+      "eatm_withheld_amount": "0",
+      "cash_withheld_amount": "0",
+      "execution_price": "420.2",
+      "stock_code": "ITC",
+      "exchange_code": "NSE",
+      "trade_id": "TRADE-TEST-1",
+      "exchange_trade_time": "05-Feb-2025 10:41:24"
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "market.option_chain": {
+    "Success": [{
+      "exchange_code": "NFO",
+      "product_type": "Options",
+      "stock_code": "NIFTY",
+      "expiry_date": "27-Feb-2025",
+      "right": "Call",
+      "strike_price": 24000.0,
+      "ltp": 6.0,
+      "ltt": "",
+      "best_bid_price": 5.95,
+      "best_bid_quantity": "75",
+      "best_offer_price": 6.05,
+      "best_offer_quantity": "150",
+      "open": 7.0,
+      "high": 7.5,
+      "low": 5.5,
+      "previous_close": 6.5,
+      "ltp_percent_change": -7.69,
+      "upper_circuit": 20.0,
+      "lower_circuit": 0.05,
+      "total_quantity_traded": "15000",
+      "spot_price": "23787",
+      "ltq": "75",
+      "open_interest": 2435175.0,
+      "chnge_oi": 1500.0,
+      "total_buy_qty": "7500",
+      "total_sell_qty": "8250"
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "orders.preview_equity": {
+    "Success": {
+      "brokerage": 0.63,
+      "exchange_turnover_charges": 0.03,
+      "stamp_duty": 0.14,
+      "stt": 0.91,
+      "sebi_charges": 0.0,
+      "gst": 0.12,
+      "total_turnover_and_sebi_charges": 0.03,
+      "total_other_charges": 1.19,
+      "total_brokerage": 1.83
+    },
+    "Status": 200,
+    "Error": null
+  },
+  "orders.preview_fno": {
+    "Success": {
+      "brokerage": 7.0,
+      "exchange_turnover_charges": 0.17,
+      "stamp_duty": 0.01,
+      "stt": 0.0,
+      "sebi_charges": 0.0,
+      "gst": 1.29,
+      "total_turnover_and_sebi_charges": 0.17,
+      "total_other_charges": 1.47,
+      "total_brokerage": 8.47
+    },
+    "Status": 200,
+    "Error": null
+  },
+  "market.historical_v2": {
+    "Success": [{
+      "datetime": "2025-02-03 09:21:00",
+      "stock_code": "NIFTY",
+      "exchange_code": "NFO",
+      "product_type": "Options",
+      "expiry_date": "27-FEB-25",
+      "right": "Call",
+      "strike_price": "24000",
+      "open": "6.15",
+      "high": "6.90",
+      "low": "5.50",
+      "close": "6.00",
+      "volume": "304575",
+      "open_interest": "2435175",
+      "count": 6
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "gtt.place": {
+    "Success": {"gtt_order_id":"GTT-TEST-1","message":"Your GTT Order Request Placed Successfully"},
+    "Status": 200,
+    "Error": null
+  },
+  "gtt.list": {
+    "Success": [{
+      "order_details": [
+        {"gtt_leg_type":"Target","action":"Sell","trigger_price":11.5,"limit_price":12.0,"status":"Cancelled","gtt_order_id":"GTT-TEST-1"},
+        {"gtt_leg_type":"Stoploss","action":"Sell","trigger_price":5.0,"limit_price":4.0,"status":"Cancelled","gtt_order_id":"GTT-TEST-1"}
+      ],
+      "exchange_code": "NFO",
+      "product_type": "Options",
+      "stock_code": "NIFTY",
+      "expiry_date": "27-Feb-2025",
+      "strike_price": 24000.0,
+      "right": "Call",
+      "quantity": 75,
+      "index_or_stock": "Index",
+      "gtt_type": "Cover OCO",
+      "fresh_order_id": "ORDER-TEST-1",
+      "order_datetime": "05-FEB-2025 11:14:38"
+    }],
+    "Status": 200,
+    "Error": null
+  },
+  "gtt.cancel": {
+    "Success": {"order_id":"GTT-TEST-1","message":"Your Order Cancelled successfully."},
+    "Status": 200,
+    "Error": null
+  },
+  "gtt.modify": {
+    "Success": {"gtt_order_id":"GTT-TEST-1","message":"Order Modified Successfully"},
+    "Status": 200,
+    "Error": null
+  }
+}

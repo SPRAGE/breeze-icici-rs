@@ -1,0 +1,58 @@
+{
+  "application_error_with_http_200": {
+    "http_status": 200,
+    "body": {"Success":null,"Status":500,"Error":"Synthetic application failure"},
+    "expected_category": "Api"
+  },
+  "bad_request": {
+    "http_status": 400,
+    "body": {"Success":null,"Status":400,"Error":"Synthetic bad request"},
+    "expected_category": "Validation"
+  },
+  "unauthorized": {
+    "http_status": 401,
+    "body": {"Success":null,"Status":401,"Error":"Synthetic authentication failure"},
+    "expected_category": "Authentication"
+  },
+  "forbidden": {
+    "http_status": 403,
+    "body": {"Success":null,"Status":403,"Error":"Synthetic permission failure"},
+    "expected_category": "PermissionDenied"
+  },
+  "not_found": {
+    "http_status": 404,
+    "body": {"Success":null,"Status":404,"Error":"Synthetic resource missing"},
+    "expected_category": "NotFound"
+  },
+  "request_timeout": {
+    "http_status": 408,
+    "body": {"Success":null,"Status":408,"Error":"Synthetic request timeout"},
+    "expected_category": "Timeout"
+  },
+  "rate_limited": {
+    "http_status": 429,
+    "headers": {"Retry-After":"2"},
+    "body": {"Success":null,"Status":429,"Error":"Synthetic rate limit"},
+    "expected_category": "RateLimited"
+  },
+  "server_error": {
+    "http_status": 503,
+    "body": {"Success":null,"Status":503,"Error":"Synthetic dependency unavailable"},
+    "expected_category": "Api"
+  },
+  "success_null": {
+    "http_status": 200,
+    "body": {"Success":null,"Status":200,"Error":null},
+    "expected_category": "Protocol"
+  },
+  "empty_success_list": {
+    "http_status": 200,
+    "body": {"Success":[],"Status":200,"Error":null},
+    "expected_category": "Success"
+  },
+  "unknown_status": {
+    "http_status": 599,
+    "body": {"Success":null,"Status":599,"Error":"Synthetic unknown status"},
+    "expected_category": "Api"
+  }
+}

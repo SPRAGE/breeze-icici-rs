@@ -1,0 +1,7 @@
+error[E0599]: no method named `trading` found for struct `BreezeClient<breeze_icici::Pending>` in the current scope
+  --> tests/ui/unauthenticated_client_cannot_trade.rs:10:28
+   |
+10 |     let _trading = pending.trading();
+   |                            ^^^^^^^ method not found in `BreezeClient<breeze_icici::Pending>`
+   |
+   = note: the method was found for `BreezeClient<Authenticated>`

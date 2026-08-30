@@ -1,0 +1,37 @@
+error[E0277]: the trait bound `RawMutation: breeze_icici::request::sealed::Sealed` is not satisfied
+ --> tests/ui/custom_endpoint_request_is_sealed.rs:7:26
+  |
+7 | impl EndpointRequest for RawMutation {
+  |                          ^^^^^^^^^^^ unsatisfied trait bound
+  |
+help: the trait `breeze_icici::request::sealed::Sealed` is not implemented for `RawMutation`
+ --> tests/ui/custom_endpoint_request_is_sealed.rs:5:1
+  |
+5 | struct RawMutation;
+  | ^^^^^^^^^^^^^^^^^^
+  = help: the following other types implement trait `breeze_icici::request::sealed::Sealed`:
+            CancelGttOrderRequest
+            CancelOrderRequest
+            CustomerDetailsRequest
+            GetDematHoldings
+            GetFunds
+            GetMarginRequest
+            GetPositions
+            GttOrderListRequest
+          and $N others
+note: required by a bound in `EndpointRequest`
+ --> src/request.rs
+  |
+  | pub trait EndpointRequest: sealed::Sealed + Clone + Send + Sync + 'static {
+  |                            ^^^^^^^^^^^^^^ required by this bound in `EndpointRequest`
+  = note: `EndpointRequest` is a "sealed trait", because to implement it you also need to implement `breeze_icici::request::sealed::Sealed`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+  = help: the following types implement the trait:
+            breeze_icici::account::CustomerDetailsRequest
+            breeze_icici::account::GetDematHoldings
+            breeze_icici::account::GetFunds
+            breeze_icici::account::SetFundsRequest
+            breeze_icici::account::GetMarginRequest
+            breeze_icici::gtt::GttOrderRequest
+            breeze_icici::gtt::GttOrderListRequest
+            breeze_icici::gtt::CancelGttOrderRequest
+          and $N others

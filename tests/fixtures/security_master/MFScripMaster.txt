@@ -1,0 +1,2 @@
+"CompanyCode", "SchemeCode", "AmfiCd", "NAV", "NAVDate", "RecommendationFlag", "Rating","SchemeName", "SchemeOption", "NFOFlag", "AMCName", "SubCategory", "Category", "ISIN", "DR_ISIN", "Type", "Direct_flag"
+"21","TESTD","100001","53.5963","26-Aug-2026","H","4","TEST LARGE CAP FUND - IDCW","Dividend","N","TEST ASSET MANAGEMENT",Large Cap Fund,Equity,"INF000TEST001","INF000TEST002","Mutual Fund","N"

@@ -1,0 +1,59 @@
+{
+  "stream_credentials": {
+    "session_token": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA==",
+    "user": "user-test",
+    "token": "session-test"
+  },
+  "quote_nse": {
+    "raw": ["4.1!1001",420.0,421.2,423.0,418.5,0.28,421.1,63,421.3,18,100,420.7,2158026,237149,370391,"90.82C","",380.0,460.0,1739246902,420.0],
+    "expected": {"symbol":"4.1!1001","open":"420.0","last":"421.2","exchange":"NseEquity","total_sell_quantity":"370391"}
+  },
+  "quote_nfo": {
+    "raw": ["4.1!2001",6.2,6.0,7.5,5.5,-3.23,5.95,75,6.05,150,75,6.4,2435175,1500,304575,15000,8250,"1.95C","",0.05,20.0,1739246902,6.5],
+    "expected": {"symbol":"4.1!2001","open_interest":"2435175","change_open_interest":"1500","exchange":"NseFuturesAndOptions"}
+  },
+  "market_depth_bse": {
+    "raw": ["1.2!3001",1739246902,[[420.0,10,420.5,12],[419.5,20,421.0,25]]],
+    "expected": {"levels":2,"first_buy_price":"420.0","first_sell_price":"420.5","exchange":"Bse"}
+  },
+  "market_depth_nse": {
+    "raw": ["4.2!1001",1739246902,[[420.0,10,2,"B",420.5,12,3,"S"]]],
+    "expected": {"levels":1,"first_buy_orders":2,"first_sell_orders":3,"exchange":"NseEquity"}
+  },
+  "commodity": {
+    "raw": ["6.1!4001",0,0,0,1000,350.5,5,1739246902,349.8,500,450,"",349.0,348.0,352.0,347.0,0,12500,300,500.0,100.0,350500.0,[10,350.4,2,0,12,350.6,3,0]],
+    "expected": {"symbol":"6.1!4001","last":"350.5","current_open_interest":"12500","exchange":"Commodity"}
+  },
+  "order_cash": {
+    "raw": ["1","","USER-TEST","","249","5","SEQ-TEST-1","10-03-2025","14:13:22","Intraday Calls","N","4","ACCOUNT-REDACTED","NSE","ITC","B","L","T","420.00","C","O","10-Mar-2025","10-Mar-2025","ORDER-TEST-1","1","1","0","0","0","0","0","N","420.00","25","WEB","NSE","SETTLEMENT-TEST","Cash","N","","10-Mar-2025","","0.00","N","N","0","PARTNER-TEST"],
+    "expected": {"message_type":"4","stock_code":"ITC","action":"Buy","status":"Ordered","order_reference":"ORDER-TEST-1"}
+  },
+  "order_derivative": {
+    "raw": ["1","","USER-TEST","","249","5","SEQ-TEST-2","10-03-2025","14:13:22","Intraday Calls","N","6","ACCOUNT-REDACTED","NFO","NIFTY","O","C","E","2400000","27-Feb-2025","27-Feb-2025","B","L","T","6.00","R","ORDER-TEST-2","75","0","0","0","5.00","N","25","WEB","Y","10-Mar-2025","ACK-TEST","450.00","0.00","0","N","N","Y","N","N","PARTNER-TEST"],
+    "expected": {"message_type":"6","stock_code":"NIFTY","product":"Options","right":"Call","status":"Requested"}
+  },
+  "one_click_fno": {
+    "raw": ["2025-02-07 14:29:29","2025-02-07 14:29:29","PORTFOLIO-TEST","Call Initiated","Index Long Call","NFO","options","Index","NIFTY","2025-02-13 00:00:00","E","call","24000","buy","5.50","6.00","75","6.10","6.05","6.15","75","12.00","450.00","4.00","150.00","450.00","1","active"],
+    "expected": {"portfolio_id":"PORTFOLIO-TEST","underlying":"NIFTY","status":"active"}
+  },
+  "one_click_equity": {
+    "raw": {"stock_name":"TEST COMPANY(TESTCO)Margin-Buy","stock_code":"TESTCO","action_type":"buy","expiry_date":"","strike_price":"","option_type":"","stock_description":"Margin","recommended_price_and_date":"100-101,2025-01-02 09:37:01","recommended_price_from":"100","recommended_price_to":"101","recommended_date":"2025-01-02 09:37:01","target_price":"106","sltp_price":"97","part_profit_percentage":"0,0","profit_price":"0","exit_price":"0","recommended_update":"","iclick_status":"open","subscription_type":"iclick_2_gain"},
+    "expected": {"stock_code":"TESTCO","action":"Buy","status":"open"}
+  },
+  "candle_equity": {
+    "raw": "NSE,NIFTY,18687.95,18687.95,18687.95,18687.95,0,2022-12-02 14:13:53,1SEC",
+    "expected": {"exchange":"NSE","stock_code":"NIFTY","interval":"1second","volume":"0"}
+  },
+  "candle_option": {
+    "raw": "NFO,NIFTY,08-Dec-2022,18700.0,CE,120.5,120.5,120.5,120.5,2500,7592550,2022-12-02 14:10:14,1SEC",
+    "expected": {"exchange":"NFO","stock_code":"NIFTY","right":"Call","strike":"18700.0","open_interest":"7592550"}
+  },
+  "candle_future": {
+    "raw": "NFO,NIFTY,29-Dec-2022,18807.35,18807.35,18807.35,18807.35,0,11771450,2022-12-02 14:19:21,1SEC",
+    "expected": {"exchange":"NFO","stock_code":"NIFTY","open_interest":"11771450","interval":"1second"}
+  },
+  "unknown": {
+    "raw": ["99.9!9999",1,2,3],
+    "expected": {"preserved":true}
+  }
+}

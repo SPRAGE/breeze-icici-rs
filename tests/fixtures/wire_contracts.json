@@ -1,0 +1,202 @@
+{
+  "auth.customer_details": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/customerdetails",
+    "auth": "session_exchange",
+    "body": "{\"SessionToken\":\"api-session-test\",\"AppKey\":\"app-key-test\"}"
+  },
+  "account.demat_holdings": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/dematholdings",
+    "auth": "signed_v1",
+    "body": "{}"
+  },
+  "account.get_funds": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/funds",
+    "auth": "signed_v1",
+    "body": "{}"
+  },
+  "account.set_funds": {
+    "method": "POST",
+    "base": "rest_v1",
+    "path": "/funds",
+    "auth": "signed_v1",
+    "body": "{\"transaction_type\":\"Credit\",\"amount\":\"10000\",\"segment\":\"FNO\"}"
+  },
+  "market.historical_v1": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/historicalcharts",
+    "auth": "signed_v1",
+    "body": "{\"interval\":\"minute\",\"from_date\":\"2025-02-03T09:15:00.000Z\",\"to_date\":\"2025-02-03T15:30:00.000Z\",\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product_type\":\"cash\"}"
+  },
+  "risk.margin_calculator": {
+    "method": "POST",
+    "base": "rest_v1",
+    "path": "/margincalculator",
+    "auth": "signed_v1",
+    "body": "{\"list_of_positions\":[{\"strike_price\":\"0\",\"quantity\":\"75\",\"right\":\"others\",\"product\":\"futures\",\"action\":\"buy\",\"price\":\"23400\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"stock_code\":\"NIFTY\"}],\"exchange_code\":\"NFO\"}"
+  },
+  "account.get_margin": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/margin",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NSE\"}"
+  },
+  "orders.place": {
+    "method": "POST",
+    "base": "rest_v1",
+    "path": "/order",
+    "auth": "signed_v1",
+    "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"action\":\"buy\",\"order_type\":\"limit\",\"quantity\":\"1\",\"price\":\"420.00\",\"validity\":\"day\",\"user_remark\":\"rustsdk\"}"
+  },
+  "orders.detail": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/order",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NSE\",\"order_id\":\"ORDER-TEST-1\"}"
+  },
+  "orders.list": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/order",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NSE\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\"}"
+  },
+  "orders.cancel": {
+    "method": "DELETE",
+    "base": "rest_v1",
+    "path": "/order",
+    "auth": "signed_v1",
+    "body": "{\"order_id\":\"ORDER-TEST-1\",\"exchange_code\":\"NSE\"}"
+  },
+  "orders.modify": {
+    "method": "PUT",
+    "base": "rest_v1",
+    "path": "/order",
+    "auth": "signed_v1",
+    "body": "{\"order_id\":\"ORDER-TEST-1\",\"exchange_code\":\"NSE\",\"quantity\":\"2\",\"price\":\"421.00\"}"
+  },
+  "risk.limit_price": {
+    "method": "POST",
+    "base": "rest_v1",
+    "path": "/fnolmtpriceandqtycal",
+    "auth": "signed_v1",
+    "body": "{\"strike_price\":\"24000\",\"product_type\":\"options\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"underlying\":\"NIFTY\",\"exchange_code\":\"NFO\",\"order_flow\":\"buy\",\"stop_loss_trigger\":\"5.00\",\"option_type\":\"call\",\"source_flag\":\"P\",\"limit_rate\":\"6.00\",\"order_reference\":\"ORDER-TEST-1\",\"available_quantity\":\"75\",\"market_type\":\"limit\",\"fresh_order_limit\":\"6.00\"}"
+  },
+  "portfolio.holdings": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/portfolioholdings",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NSE\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\",\"stock_code\":\"ITC\"}"
+  },
+  "portfolio.positions": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/portfoliopositions",
+    "auth": "signed_v1",
+    "body": "{}"
+  },
+  "market.quotes": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/quotes",
+    "auth": "signed_v1",
+    "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product_type\":\"cash\"}"
+  },
+  "orders.square_off": {
+    "method": "POST",
+    "base": "rest_v1",
+    "path": "/squareoff",
+    "auth": "signed_v1",
+    "body": "{\"source_flag\":\"\",\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"quantity\":\"75\",\"price\":\"6.00\",\"action\":\"sell\",\"order_type\":\"limit\",\"validity\":\"day\",\"stoploss_price\":\"\",\"disclosed_quantity\":\"0\",\"protection_percentage\":\"\",\"settlement_id\":\"\",\"margin_amount\":\"\",\"open_quantity\":\"75\",\"cover_quantity\":\"\",\"product_type\":\"options\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"alias_name\":\"\",\"trade_password\":\"\"}"
+  },
+  "trades.list": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/trades",
+    "auth": "signed_v1",
+    "body": "{\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\",\"exchange_code\":\"NSE\",\"product_type\":\"cash\",\"action\":\"buy\",\"stock_code\":\"ITC\"}"
+  },
+  "trades.detail": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/trades",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NSE\",\"order_id\":\"ORDER-TEST-1\"}"
+  },
+  "market.option_chain": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/optionchain",
+    "auth": "signed_v1",
+    "body": "{\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"product_type\":\"options\",\"right\":\"call\",\"strike_price\":\"24000\"}"
+  },
+  "orders.preview_equity": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/preview_order",
+    "auth": "signed_v1",
+    "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"order_type\":\"limit\",\"price\":\"420.00\",\"action\":\"buy\",\"quantity\":\"1\",\"expiry_date\":\"\",\"right\":\"\",\"strike_price\":\"\",\"specialflag\":\"\",\"stoploss\":\"\",\"order_rate_fresh\":\"\"}"
+  },
+  "orders.preview_fno": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/preview_order",
+    "auth": "signed_v1",
+    "body": "{\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"product\":\"options\",\"order_type\":\"limit\",\"price\":\"6.00\",\"action\":\"buy\",\"quantity\":\"75\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"specialflag\":\"\",\"stoploss\":\"5.00\",\"order_rate_fresh\":\"6.00\"}"
+  },
+  "market.historical_v2": {
+    "method": "GET",
+    "base": "rest_v2",
+    "path": "/historicalcharts",
+    "auth": "session_v2",
+    "body": "",
+    "query": [
+      ["interval", "1minute"],
+      ["from_date", "2025-02-03T09:15:00.000Z"],
+      ["to_date", "2025-02-03T15:30:00.000Z"],
+      ["stock_code", "NIFTY"],
+      ["exch_code", "NFO"],
+      ["product_type", "options"],
+      ["expiry_date", "2025-02-27"],
+      ["right", "call"],
+      ["strike_price", "24000"]
+    ]
+  },
+  "gtt.place": {
+    "method": "POST",
+    "base": "rest_v1",
+    "path": "/gttorder",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NFO\",\"stock_code\":\"NIFTY\",\"product\":\"options\",\"quantity\":\"75\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"gtt_type\":\"cover_oco\",\"fresh_order_action\":\"buy\",\"fresh_order_price\":\"6.00\",\"fresh_order_type\":\"limit\",\"index_or_stock\":\"index\",\"trade_date\":\"2025-02-05T00:00:00.000Z\",\"order_details\":[{\"gtt_leg_type\":\"target\",\"action\":\"sell\",\"limit_price\":\"12.00\",\"trigger_price\":\"11.50\"},{\"gtt_leg_type\":\"stoploss\",\"action\":\"sell\",\"limit_price\":\"4.00\",\"trigger_price\":\"5.00\"}]}"
+  },
+  "gtt.list": {
+    "method": "GET",
+    "base": "rest_v1",
+    "path": "/gttorder",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NFO\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\"}"
+  },
+  "gtt.cancel": {
+    "method": "DELETE",
+    "base": "rest_v1",
+    "path": "/gttorder",
+    "auth": "signed_v1",
+    "body": "{\"gtt_order_id\":\"GTT-TEST-1\",\"exchange_code\":\"NFO\"}"
+  },
+  "gtt.modify": {
+    "method": "PUT",
+    "base": "rest_v1",
+    "path": "/gttorder",
+    "auth": "signed_v1",
+    "body": "{\"exchange_code\":\"NFO\",\"gtt_order_id\":\"GTT-TEST-1\",\"gtt_type\":\"cover_oco\",\"order_details\":[{\"gtt_leg_type\":\"target\",\"action\":\"sell\",\"limit_price\":\"13.00\",\"trigger_price\":\"12.50\"},{\"gtt_leg_type\":\"stoploss\",\"action\":\"sell\",\"limit_price\":\"3.50\",\"trigger_price\":\"4.50\"}]}"
+  }
+}
