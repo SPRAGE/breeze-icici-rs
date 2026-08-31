@@ -13,7 +13,7 @@ use breeze_icici::orders::{
 };
 use breeze_icici::portfolio::PortfolioType;
 
-use crate::support::{date, equity, money, option, quantity, range, stock};
+use crate::support::{date, equity, future, money, option, quantity, range, stock};
 
 #[test]
 fn quantities_are_positive_integers() {
@@ -110,6 +110,39 @@ fn option_chain_requires_two_of_expiry_right_and_strike() {
             .build()
             .is_ok()
     );
+    assert!(
+        OptionChainRequest::builder(DerivativeExchange::Mcx, stock("GOLD"))
+            .right(OptionRight::Call)
+            .strike(money("80000"))
+            .build()
+            .is_err()
+    );
+}
+
+#[test]
+fn option_chain_instrument_conversion_accepts_only_supported_options() {
+    assert!(OptionChainRequest::try_from(option()).is_ok());
+    let bfo_option = breeze_icici::domain::Instrument::option(
+        DerivativeExchange::Bfo,
+        stock("SENSEX"),
+        date("2025-02-27"),
+        OptionRight::Put,
+        money("80000"),
+    )
+    .unwrap();
+    assert!(OptionChainRequest::try_from(bfo_option).is_ok());
+    assert!(OptionChainRequest::try_from(equity()).is_err());
+    assert!(OptionChainRequest::try_from(future()).is_err());
+
+    let mcx_option = breeze_icici::domain::Instrument::option(
+        DerivativeExchange::Mcx,
+        stock("GOLD"),
+        date("2025-02-27"),
+        OptionRight::Call,
+        money("80000"),
+    )
+    .unwrap();
+    assert!(OptionChainRequest::try_from(mcx_option).is_err());
 }
 
 #[test]

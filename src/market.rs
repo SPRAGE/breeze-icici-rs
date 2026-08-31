@@ -7,8 +7,8 @@ use serde_json::Value;
 
 use crate::EndpointRequest;
 use crate::domain::{
-    Count, DateRange, DerivativeExchange, Instrument, Interval, Money, OptionRight, StockCode,
-    expiry_timestamp,
+    Count, DateRange, DerivativeExchange, Instrument, Interval, Money, OptionRight, Product,
+    StockCode, expiry_timestamp,
 };
 use crate::error::{Error, ValidationError};
 use crate::request::{AuthenticationMode, EndpointBase, compact_json};
@@ -131,6 +131,12 @@ impl EndpointRequest for HistoricalV1Request {
             stock_code: &'a str,
             exchange_code: &'a str,
             product_type: &'a str,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            expiry_date: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            strike_price: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            right: Option<&'a str>,
         }
         compact_json(&Body {
             interval: self.interval.v1_wire(),
@@ -139,6 +145,9 @@ impl EndpointRequest for HistoricalV1Request {
             stock_code: self.instrument.stock_code().as_str(),
             exchange_code: self.instrument.exchange_wire(),
             product_type: self.instrument.product().wire(),
+            expiry_date: self.instrument.expiry().map(expiry_timestamp),
+            strike_price: self.instrument.strike().map(Money::to_wire_string),
+            right: self.instrument.right().map(OptionRight::wire),
         })
     }
 }
@@ -334,12 +343,21 @@ impl EndpointRequest for QuoteRequest {
         struct Body<'a> {
             stock_code: &'a str,
             exchange_code: &'a str,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            expiry_date: Option<String>,
             product_type: &'a str,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            right: Option<&'a str>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            strike_price: Option<String>,
         }
         compact_json(&Body {
             stock_code: self.instrument.stock_code().as_str(),
             exchange_code: self.instrument.exchange_wire(),
+            expiry_date: self.instrument.expiry().map(expiry_timestamp),
             product_type: self.instrument.product().wire(),
+            right: self.instrument.right().map(OptionRight::wire),
+            strike_price: self.instrument.strike().map(Money::to_wire_string),
         })
     }
 }
@@ -366,24 +384,54 @@ impl OptionChainRequest {
             strike: None,
         })
     }
+}
 
-    pub fn from_instrument(instrument: Instrument) -> Self {
+impl TryFrom<&Instrument> for OptionChainRequest {
+    type Error = ValidationError;
+
+    fn try_from(instrument: &Instrument) -> Result<Self, Self::Error> {
+        if instrument.product() != Product::Options {
+            return Err(ValidationError::new(
+                "option chain instrument must be an option",
+            ));
+        }
         let exchange = match instrument.exchange() {
             crate::domain::Exchange::Nfo => DerivativeExchange::Nfo,
             crate::domain::Exchange::Bfo => DerivativeExchange::Bfo,
-            crate::domain::Exchange::Ndx => DerivativeExchange::Ndx,
-            crate::domain::Exchange::Mcx => DerivativeExchange::Mcx,
-            _ => DerivativeExchange::Nfo,
+            _ => {
+                return Err(ValidationError::new(
+                    "option chain supports only NFO or BFO",
+                ));
+            }
         };
-        Self {
-            exchange,
-            stock_code: instrument.stock_code().clone(),
-            expiry: instrument.expiry(),
-            right: instrument.right(),
-            strike: instrument.strike().cloned(),
-        }
+
+        let expiry = instrument
+            .expiry()
+            .ok_or_else(|| ValidationError::new("option chain option is missing expiry"))?;
+        let right = instrument
+            .right()
+            .ok_or_else(|| ValidationError::new("option chain option is missing right"))?;
+        let strike = instrument
+            .strike()
+            .cloned()
+            .ok_or_else(|| ValidationError::new("option chain option is missing strike"))?;
+
+        Self::builder(exchange, instrument.stock_code().clone())
+            .expiry(expiry)
+            .right(right)
+            .strike(strike)
+            .build()
     }
 }
+
+impl TryFrom<Instrument> for OptionChainRequest {
+    type Error = ValidationError;
+
+    fn try_from(instrument: Instrument) -> Result<Self, Self::Error> {
+        Self::try_from(&instrument)
+    }
+}
+
 impl OptionChainBuilder {
     pub fn expiry(mut self, value: NaiveDate) -> Self {
         self.0.expiry = Some(value);
@@ -398,6 +446,14 @@ impl OptionChainBuilder {
         self
     }
     pub fn build(self) -> Result<OptionChainRequest, ValidationError> {
+        if !matches!(
+            self.0.exchange,
+            DerivativeExchange::Nfo | DerivativeExchange::Bfo
+        ) {
+            return Err(ValidationError::new(
+                "option chain supports only NFO or BFO",
+            ));
+        }
         let count = self.0.expiry.is_some() as u8
             + self.0.right.is_some() as u8
             + self.0.strike.is_some() as u8;

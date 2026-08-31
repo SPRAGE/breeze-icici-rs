@@ -108,7 +108,9 @@ fn all_documented_candle_csv_layouts_and_intervals_decode() {
     };
     assert_eq!(equity.exchange(), Exchange::Nse);
     assert_eq!(equity.interval(), CandleInterval::OneSecond);
-    assert_eq!(equity.open().to_string(), "18687.95");
+    assert_eq!(equity.low().to_string(), "18680.10");
+    assert_eq!(equity.high().to_string(), "18690.20");
+    assert_eq!(equity.open().to_string(), "18685.30");
     assert_eq!(equity.close().to_string(), "18687.95");
     assert_eq!(equity.volume().get(), 0);
 
@@ -119,6 +121,10 @@ fn all_documented_candle_csv_layouts_and_intervals_decode() {
     };
     assert_eq!(option.right(), Some(&OptionRight::Call));
     assert_eq!(option.strike().unwrap().to_string(), "18700.0");
+    assert_eq!(option.low().to_string(), "118.5");
+    assert_eq!(option.high().to_string(), "122.5");
+    assert_eq!(option.open().to_string(), "120.5");
+    assert_eq!(option.close().to_string(), "121.0");
     assert_eq!(option.open_interest().unwrap().to_string(), "7592550");
 
     let StreamEvent::Candle(future) =
@@ -127,6 +133,10 @@ fn all_documented_candle_csv_layouts_and_intervals_decode() {
         panic!("expected future candle")
     };
     assert_eq!(future.right(), None);
+    assert_eq!(future.low().to_string(), "18790.1");
+    assert_eq!(future.high().to_string(), "18820.2");
+    assert_eq!(future.open().to_string(), "18807.35");
+    assert_eq!(future.close().to_string(), "18810.4");
     assert_eq!(future.open_interest().unwrap().to_string(), "11771450");
 
     for (wire, interval) in [

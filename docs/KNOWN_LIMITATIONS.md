@@ -4,8 +4,7 @@ Version `0.0.1` is an experimental source release. Its hermetic tests prove the 
 
 The following areas require a tests-first hardening pass before crates.io publication or production use:
 
-- derivative quote and historical-v1 requests do not yet serialize every conditional contract field;
-- option-chain modeling does not yet cover every documented product variant and rejects some invalid states only at runtime;
+- option-chain modeling currently represents options only; the maintained Python SDK's futures form remains unmodeled, while non-option instruments and non-NFO/BFO exchanges are rejected before I/O;
 - calculator and GTT models cannot represent every documented empty/zero-valued input and do not encode every exchange/date invariant;
 - signed response money values represented as JSON numbers can pass through floating-point deserialization;
 - several response fields remain opaque strings or raw JSON values;

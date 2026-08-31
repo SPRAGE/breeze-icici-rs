@@ -98,6 +98,8 @@ The `trading()` name is an attention boundary, not a permissions system. Broker/
 
 Request fields are private and built through constructors/builders. The public order model contains limit and explicit stop-loss orders; it has no market-order variant. Stop-loss constructors validate the buy/sell limit-to-trigger relationship before I/O. The documented GTT surface includes typed single-leg and cover-OCO constructors; the SDK-only plain `oco` spelling is not inferred into the page contract.
 
+`OptionChainRequest` implements fallible conversion from owned or borrowed `Instrument` values. Conversion accepts only option instruments on NFO or BFO, and the builder independently enforces those exchanges plus the documented two-of-three contract-filter rule. Unsupported instruments fail before signing or transport rather than being rewritten to another exchange.
+
 ## Authentication and wire protocols
 
 ### CustomerDetails
@@ -167,7 +169,7 @@ Subscriptions are locally validated, deduplicated, and capped at 2,000. Quote an
 
 The production adapter maintains desired subscription state, reconnects with bounded delays/attempts, reauthenticates, and replays each active subscription once. `unsubscribe` sends leave and removes desired state. `shutdown` sends remaining leaves and disconnects; drop is best-effort, so applications should call `shutdown` explicitly.
 
-Events are decoded by pure, bounds-checked codecs. Unknown well-formed data is returned as `StreamEvent::Unknown`; malformed data returns `StreamError::Decode` without panicking or closing the stream. The channel is bounded. Overflow becomes `LaggedRequiresReconciliation`, especially important for orders. `wait_until_reconnected_for` gives callers a bounded wait.
+Events are decoded by pure, bounds-checked codecs. One Click Equity consumes the maintained SDK's raw 19-position list, and OHLCV codecs map the documented low/high/open/close positions explicitly for all three layouts. Unknown well-formed data is returned as `StreamEvent::Unknown`; malformed data returns `StreamError::Decode` without panicking or closing the stream. The channel is bounded. Overflow becomes `LaggedRequiresReconciliation`, especially important for orders. `wait_until_reconnected_for` gives callers a bounded wait.
 
 The production adapter is compile-tested and fake-transport tested, not live-handshake qualified. `rust_socketio` 0.6 currently brings native TLS/OpenSSL independently of the REST TLS selection.
 

@@ -224,7 +224,7 @@ pub(crate) fn trade_detail() -> TradeDetailRequest {
 }
 
 pub(crate) fn option_chain() -> OptionChainRequest {
-    OptionChainRequest::from_instrument(option())
+    OptionChainRequest::try_from(option()).unwrap()
 }
 
 pub(crate) fn preview_equity() -> PreviewOrderRequest {
@@ -312,6 +312,30 @@ fn market_data_and_risk_wire_contracts() {
     assert_wire("market.option_chain", option_chain());
     assert_wire("risk.margin_calculator", margin_calculation());
     assert_wire("risk.limit_price", limit_price());
+}
+
+#[test]
+fn derivative_reads_preserve_the_complete_contract_identity() {
+    let historical = HistoricalV1Request::new(
+        Interval::OneMinute,
+        range("2025-02-03T09:15:00.000Z", "2025-02-03T15:30:00.000Z"),
+        option(),
+    )
+    .unwrap();
+    assert_eq!(
+        prepared(historical).body(),
+        br#"{"interval":"minute","from_date":"2025-02-03T09:15:00.000Z","to_date":"2025-02-03T15:30:00.000Z","stock_code":"NIFTY","exchange_code":"NFO","product_type":"options","expiry_date":"2025-02-27T00:00:00.000Z","strike_price":"24000","right":"call"}"#
+    );
+
+    assert_eq!(
+        prepared(QuoteRequest::new(option())).body(),
+        br#"{"stock_code":"NIFTY","exchange_code":"NFO","expiry_date":"2025-02-27T00:00:00.000Z","product_type":"options","right":"call","strike_price":"24000"}"#
+    );
+
+    assert_eq!(
+        prepared(QuoteRequest::new(future())).body(),
+        br#"{"stock_code":"NIFTY","exchange_code":"NFO","expiry_date":"2025-02-27T00:00:00.000Z","product_type":"futures"}"#
+    );
 }
 
 #[test]

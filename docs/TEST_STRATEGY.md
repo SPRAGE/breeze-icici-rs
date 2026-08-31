@@ -7,7 +7,7 @@ The repository has two explicit contract entry points:
 | Command | Current local result | Purpose |
 |---|---|---|
 | `cargo test --test fixture_corpus` | 7 passing tests | Validates the source inventory, 27 REST/five stream fixture corpus, required documents, and synthetic-data boundary. |
-| `cargo test --features sdk-contract --test sdk_contract` | 99 passing tests | Exercises the public API, exact wires, models, HTTP behavior, rate limits, stream codecs/lifecycle, parser, and compile-fail safety boundaries. |
+| `cargo test --features sdk-contract --test sdk_contract` | 101 passing tests | Exercises the public API, exact wires, models, HTTP behavior, rate limits, stream codecs/lifecycle, parser, and compile-fail safety boundaries. |
 
 The five Trybuild cases have reviewed `.stderr` goldens. They fail for their intended reason: credentials are not serializable, pending clients cannot trade, cash instruments cannot gain expiry fields, market orders are not constructible, and downstream crates cannot implement the sealed signed-request contract.
 
@@ -25,10 +25,13 @@ All normal tests are hermetic. Wiremock tests bind only loopback ports and never
 | Numeric strings/nulls corrupt values | Fixture/model decoding | `contract/responses.rs` |
 | Unknown upstream status gains a false meaning | Forward-compatibility decoding | `contract/responses.rs` |
 | Wrong method/path/header/body | One prepared-request contract per operation | `contract/rest_wire.rs` |
+| Derivative identity is omitted or reordered | Exact quote and historical-v1 variant bodies | `contract/rest_wire.rs` |
+| Invalid option-chain instrument is silently rewritten | Fallible conversion and builder validation | `contract/validation.rs` |
 | Historical v2 accidentally uses v1 signing | Prepared request plus loopback HTTP | `contract/rest_wire.rs`, `contract/transport.rs` |
 | Mutation duplicates after uncertain write | Loopback request count and delayed response | `contract/transport.rs` |
 | Deadline excludes limiter/retry waits | Paused-time and loopback deadline tests | `contract/transport.rs` |
 | Client exceeds configured local gates | Paused-time model tests | `contract/rate_limit.rs` |
+| Positional stream fields are swapped or pre-normalized | Distinct-value raw frame fixtures | `contract/streaming.rs`, `fixtures/stream_frames.json` |
 | Malformed stream data panics | Table and bounded property tests | `contract/streaming.rs` |
 | Reconnect loses/duplicates desired state | Deterministic fake Socket.IO | `contract/streaming.rs` |
 | Stream memory growth or silent loss | Capacity/lag tests | `contract/streaming.rs` |
@@ -58,7 +61,7 @@ These need no socket or wall clock:
 - compact JSON and fixed SHA-256 vectors;
 - response number/string/null compatibility;
 - HTTP/Breeze error categorization and bounded redaction;
-- all observed stream layouts and malformed variants;
+- all observed raw stream layouts, including distinct OHLC prices and the 19-position One Click Equity frame, plus malformed variants;
 - all security-master schemas, duplicate policy, and lookup identity;
 - local rate-limit state with paused Tokio time.
 
@@ -68,7 +71,7 @@ Stream decoder property coverage runs 512 bounded arbitrary-JSON cases and requi
 
 The `sdk-contract`/`test-util` hook exposes the method, URL, selected headers, and body after validation/signing but before I/O. It is used for all 27 operations so the suite compares exact compact body bytes, including unusual v1 `GET` and `DELETE` bodies.
 
-This layer also verifies the lowercase option-chain path, `exch_code`, explicit stop-loss fields, omitted optionals, GTT leg arrays, auth mode, and historical-v2 query encoding.
+This layer also verifies derivative quote/historical-v1 identity fields, the lowercase option-chain path, `exch_code`, explicit stop-loss fields, omitted optionals, GTT leg arrays, auth mode, and historical-v2 query encoding.
 
 ### 4. Loopback Reqwest integration
 

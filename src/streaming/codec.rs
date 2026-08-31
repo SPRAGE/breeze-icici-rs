@@ -209,24 +209,18 @@ pub fn decode_one_click_fno(value: &Value) -> Result<super::OneClickFno, StreamD
 }
 
 pub fn decode_one_click_equity(value: &Value) -> Result<super::OneClickEquity, StreamDecodeError> {
-    let object = value
-        .as_object()
-        .ok_or_else(|| StreamDecodeError::new("One Click Equity frame must be an object"))?;
-    if object.len() > 128 {
+    let values = value
+        .as_array()
+        .ok_or_else(|| StreamDecodeError::new("One Click Equity frame must be an array"))?;
+    if values.len() != 19 {
         return Err(StreamDecodeError::new(
-            "One Click Equity frame is too large",
+            "One Click Equity frame must contain 19 fields",
         ));
     }
-    let get = |name: &str| {
-        object
-            .get(name)
-            .and_then(Value::as_str)
-            .ok_or_else(|| StreamDecodeError::new(format!("missing {name}")))
-    };
     Ok(one_click_equity(
-        StockCode::new(get("stock_code")?).map_err(invalid)?,
-        get("subscription_type")?.to_owned(),
-        get("iclick_status")?.to_owned(),
+        StockCode::new(text(&values[1])?).map_err(invalid)?,
+        text(&values[18])?.to_owned(),
+        text(&values[17])?.to_owned(),
     ))
 }
 
@@ -242,9 +236,9 @@ pub fn decode_candle(value: &str) -> Result<StreamEvent, StreamDecodeError> {
         9 => CandleParts {
             exchange,
             stock_code,
-            open: parse_money(fields[2])?,
+            low: parse_money(fields[2])?,
             high: parse_money(fields[3])?,
-            low: parse_money(fields[4])?,
+            open: parse_money(fields[4])?,
             close: parse_money(fields[5])?,
             volume: parse_count(fields[6])?,
             interval: CandleInterval::from_channel(fields[8])?,
@@ -257,9 +251,9 @@ pub fn decode_candle(value: &str) -> Result<StreamEvent, StreamDecodeError> {
             stock_code,
             strike: Some(parse_money(fields[3])?),
             right: OptionRight::from_wire(fields[4]),
-            open: parse_money(fields[5])?,
+            low: parse_money(fields[5])?,
             high: parse_money(fields[6])?,
-            low: parse_money(fields[7])?,
+            open: parse_money(fields[7])?,
             close: parse_money(fields[8])?,
             volume: parse_count(fields[9])?,
             open_interest: Some(parse_money(fields[10])?),
@@ -268,9 +262,9 @@ pub fn decode_candle(value: &str) -> Result<StreamEvent, StreamDecodeError> {
         11 => CandleParts {
             exchange,
             stock_code,
-            open: parse_money(fields[3])?,
+            low: parse_money(fields[3])?,
             high: parse_money(fields[4])?,
-            low: parse_money(fields[5])?,
+            open: parse_money(fields[5])?,
             close: parse_money(fields[6])?,
             volume: parse_count(fields[7])?,
             open_interest: Some(parse_money(fields[8])?),

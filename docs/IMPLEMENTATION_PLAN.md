@@ -66,7 +66,7 @@ The optional download/cache helper from the original plan was deliberately not a
 
 ### 6. Streaming codecs — complete locally
 
-Implemented strict base64 `user:token` decoding and pure codecs for quote, BSE/NSE depth, commodity, cash/derivative order notifications, One Click F&O/equity, and equity/future/option OHLCV layouts. Unknown well-formed ticks remain raw.
+Implemented strict base64 `user:token` decoding and pure codecs for quote, BSE/NSE depth, commodity, cash/derivative order notifications, One Click F&O plus the raw 19-position One Click Equity frame, and equity/future/option OHLCV layouts with explicit low/high/open/close ordering. Unknown well-formed ticks remain raw.
 
 Proof: documented layout fixtures plus 512-case bounded arbitrary-JSON property coverage.
 
@@ -133,6 +133,16 @@ Report local/build proof separately from MSRV, live compatibility, publication, 
 - The project guidance compiler reported all 15 generated files current and within context budgets.
 
 The run used Rust 1.97.1. Rust 1.85 remains a declared but unproven MSRV. The separately prescribed external `ai-doctor` was not executed because the environment rejected downloading and running an unpinned GitHub flake; the local guidance compiler is the available proof. No live or publication evidence was produced.
+
+## Correctness hardening evidence (2026-08-31)
+
+- Distinct-value equity, option, and future OHLCV fixtures prove the documented low/high/open/close positional mapping.
+- The One Click Equity fixture and decoder use the maintained Python SDK's raw 19-position Socket.IO frame rather than its post-parse callback object.
+- Fallible `TryFrom<Instrument>` option-chain conversion rejects cash, futures, and non-NFO/BFO options; the builder independently rejects unsupported exchanges.
+- Exact-wire variant tests prove complete expiry/right/strike identity on derivative quote and historical-v1 requests while preserving the canonical cash request bytes.
+- Fixture corpus: 7/7 passed; SDK contract: 101/101 passed; all-feature tests and one Rustdoc test passed; Nextest: 108/108 passed.
+- Rustfmt, all-target/all-feature Clippy with warnings denied, all-feature Rustdoc with warnings denied, all four TLS/streaming feature combinations, the guidance compiler, and `nix flake check --no-write-lock-file` passed on x86_64 Linux.
+- No live broker connection, credential, funds action, trading mutation, publication, or production claim was introduced.
 
 ## Review gates
 

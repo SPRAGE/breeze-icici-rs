@@ -37,20 +37,20 @@
     "expected": {"portfolio_id":"PORTFOLIO-TEST","underlying":"NIFTY","status":"active"}
   },
   "one_click_equity": {
-    "raw": {"stock_name":"TEST COMPANY(TESTCO)Margin-Buy","stock_code":"TESTCO","action_type":"buy","expiry_date":"","strike_price":"","option_type":"","stock_description":"Margin","recommended_price_and_date":"100-101,2025-01-02 09:37:01","recommended_price_from":"100","recommended_price_to":"101","recommended_date":"2025-01-02 09:37:01","target_price":"106","sltp_price":"97","part_profit_percentage":"0,0","profit_price":"0","exit_price":"0","recommended_update":"","iclick_status":"open","subscription_type":"iclick_2_gain"},
+    "raw": ["TEST COMPANY(TESTCO)Margin-Buy","TESTCO","buy","","","","Margin","100-101,2025-01-02 09:37:01","100","101","2025-01-02 09:37:01","106","97","0,0","0","0","","open","iclick_2_gain"],
     "expected": {"stock_code":"TESTCO","action":"Buy","status":"open"}
   },
   "candle_equity": {
-    "raw": "NSE,NIFTY,18687.95,18687.95,18687.95,18687.95,0,2022-12-02 14:13:53,1SEC",
-    "expected": {"exchange":"NSE","stock_code":"NIFTY","interval":"1second","volume":"0"}
+    "raw": "NSE,NIFTY,18680.10,18690.20,18685.30,18687.95,0,2022-12-02 14:13:53,1SEC",
+    "expected": {"exchange":"NSE","stock_code":"NIFTY","low":"18680.10","high":"18690.20","open":"18685.30","close":"18687.95","interval":"1second","volume":"0"}
   },
   "candle_option": {
-    "raw": "NFO,NIFTY,08-Dec-2022,18700.0,CE,120.5,120.5,120.5,120.5,2500,7592550,2022-12-02 14:10:14,1SEC",
-    "expected": {"exchange":"NFO","stock_code":"NIFTY","right":"Call","strike":"18700.0","open_interest":"7592550"}
+    "raw": "NFO,NIFTY,08-Dec-2022,18700.0,CE,118.5,122.5,120.5,121.0,2500,7592550,2022-12-02 14:10:14,1SEC",
+    "expected": {"exchange":"NFO","stock_code":"NIFTY","right":"Call","strike":"18700.0","low":"118.5","high":"122.5","open":"120.5","close":"121.0","open_interest":"7592550"}
   },
   "candle_future": {
-    "raw": "NFO,NIFTY,29-Dec-2022,18807.35,18807.35,18807.35,18807.35,0,11771450,2022-12-02 14:19:21,1SEC",
-    "expected": {"exchange":"NFO","stock_code":"NIFTY","open_interest":"11771450","interval":"1second"}
+    "raw": "NFO,NIFTY,29-Dec-2022,18790.1,18820.2,18807.35,18810.4,0,11771450,2022-12-02 14:19:21,1SEC",
+    "expected": {"exchange":"NFO","stock_code":"NIFTY","low":"18790.1","high":"18820.2","open":"18807.35","close":"18810.4","open_interest":"11771450","interval":"1second"}
   },
   "unknown": {
     "raw": ["99.9!9999",1,2,3],

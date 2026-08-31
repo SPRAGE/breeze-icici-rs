@@ -52,6 +52,8 @@ The HTML snapshot and archives were temporary research inputs and are not vendor
 | GTT vocabulary | Page documents `single` and `cover_oco`, one modify sample contains `ocox`, responses use title-cased `Cover OCO`, and the maintained SDK additionally accepts plain `oco`. | Serialize only documented `single` and `cover_oco`; treat `ocox` as the sample's typo and leave SDK-only `oco` in the parity backlog. |
 | Stream protocol | prose says WebSocket, examples use Python Socket.IO, event names, and join/leave messages. | Implement Socket.IO over WebSocket transport; do not use a raw WebSocket client directly. |
 | Stream field names | Tick table/sample/parser disagree (`bQty`/`boty`, `totalSellQt`/`totalSellQ`/`totalSello`), and order sample has broken quotes/keys. | Public models use semantic snake_case fields; decoders recognize documented positional layouts and JSON aliases; unknown data is preserved. |
+| One Click Equity frame | The page shows post-parse dictionaries, while the maintained SDK receives and maps a raw 19-position Socket.IO list. | Decode the strict 19-position raw list before exposing semantic fields; do not treat the Python SDK's normalized callback dictionary as the wire frame. |
+| OHLCV field order | The page and maintained SDK define the positional price fields as low, high, open, close; samples with equal prices can conceal an index swap. | Map low/high/open/close in that exact order for equity, option, and future frames and prove it with distinct-price fixtures. |
 | Stream host examples | Some non-Python snippets call `breezeapi.icicidirect.com`, while request tables and Socket.IO examples use `livefeeds` or `livestream`. | Use family-specific hosts from the full Socket.IO examples and maintained SDK. |
 | Security-master URL | Page links `NewSecurityMaster` (five files); current SDK uses `MotherAppMaster` (seven files including MCX and MF). | The core recognizes all observed filenames and parses caller-provided readers by header/file identity. No source preference or downloader is shipped. |
 | Security-master schema | The archive contains multiple incompatible CSV layouts and mixed spacing/casing. | Header-driven per-file adapters, unknown-column tolerance, and synthetic tests for all observed schemas. |
@@ -64,9 +66,10 @@ The official response blocks often use Python literals (`'single quotes'`, `None
 - single-quoted object keys and strings become JSON strings;
 - `None` becomes `null`;
 - malformed preview-order braces/parentheses are repaired to the apparent envelope;
-- the two adjacent One Click Equity objects become a JSON array;
 - obvious sample credentials/account identifiers are replaced with synthetic values;
 - no undocumented semantic value is invented to fill an absent field.
+
+The One Click Equity wire fixture is a synthetic raw 19-position array following the maintained SDK's pre-parse mapping. The adjacent dictionaries shown by the page are callback-output examples and inform field semantics, but they are not treated as Socket.IO wire frames.
 
 Every normalized response retains the complete set of fields shown by its source sample. Where a typo could be a real wire key, aliases and raw-frame tests preserve the ambiguity instead of deleting it.
 

@@ -58,8 +58,8 @@ The option-chain path is deliberately lowercase in the selected contract. The do
 | Order Notifications | Socket.IO `order` event on `livefeeds.icicidirect.com`; cash and derivative layouts | `streaming()?.connect(StreamKind::Orders)` and `decode_order_notification` | Implemented; hermetic green; live unverified |
 | Tick Data Stream | join/leave script codes; Socket.IO `stock` event on `livestream.icicidirect.com`; quotes/depth/commodity layouts | `streaming()?.connect(StreamKind::MarketData)` and `decode_tick` | Implemented; hermetic green; live unverified |
 | One Click F&O Stream | join `["one_click_fno"]`; `stock` event | `streaming()?.connect(StreamKind::OneClickFno)` | Implemented; hermetic green; live unverified |
-| One Click Equity Stream | join `["i_click_2_gain"]`; `stock` event | `streaming()?.connect(StreamKind::OneClickEquity)` | Implemented; hermetic green; live unverified |
-| Candle Stream | `/ohlcvstream`; interval event; equity/future/option CSV layouts | `streaming()?.connect(StreamKind::Candles)` and `decode_candle` | Implemented; hermetic green; live unverified |
+| One Click Equity Stream | join `["i_click_2_gain"]`; `stock` event; raw 19-position list | `streaming()?.connect(StreamKind::OneClickEquity)` | Implemented; raw-frame contract green; live unverified |
+| Candle Stream | `/ohlcvstream`; interval event; equity/future/option CSV layouts with low/high/open/close ordering | `streaming()?.connect(StreamKind::Candles)` and `decode_candle` | Implemented; distinct-price contracts green; live unverified |
 
 Streaming contracts also cover strict session-token decoding, a 2,000-script local cap, subscription deduplication, malformed frames, unknown variants, bounded queues, reconnect replay, unsubscribe, and shutdown.
 
@@ -72,7 +72,7 @@ The implemented request builders and exact-wire tests assign documented fields t
 - optional and omitted when absent;
 - documented but broker-ignored and intentionally excluded from the normal typed API.
 
-The canonical operation bytes live in `tests/fixtures/wire_contracts.json`; additional variant tests cover stop-loss orders, optional `portfolio_type`, and single-leg GTT place/modify shapes. The typed API does not expose `validity_date` on place/modify/square-off builders because the docs explicitly state that it has no execution effect.
+The canonical operation bytes live in `tests/fixtures/wire_contracts.json`; additional variant tests cover derivative quote/historical-v1 contract identity, fail-closed option-chain conversion, stop-loss orders, optional `portfolio_type`, and single-leg GTT place/modify shapes. The typed API does not expose `validity_date` on place/modify/square-off builders because the docs explicitly state that it has no execution effect.
 
 ## Response-field coverage
 
