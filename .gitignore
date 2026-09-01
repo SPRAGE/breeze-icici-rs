@@ -6,6 +6,7 @@ result-*
 # Environment & secrets
 .env
 .env.local
+.envrc.local
 .env.production
 .env.staging
 .env.mcp
