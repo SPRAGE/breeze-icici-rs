@@ -29,6 +29,12 @@ It cannot secure a compromised process, store credentials for the application, r
 
 The documented browser login URL necessarily contains the App Key as `api_key`. It never contains the Secret Key or session token. Applications should still treat that URL as sensitive operational data and avoid logging it broadly.
 
+Repository examples read credentials only from the process environment and do
+not load local files. All local operation/instrument inputs are validated before
+authentication or endpoint I/O. Read-only and streaming examples may contact
+ICICI only when explicitly run; the mutation example has no client and cannot
+send its constructed set-funds, order, square-off, or GTT requests.
+
 Zeroization is defense in depth: clones and allocator/runtime copies can exist, and it does not protect swap, core dumps, a debugger, or a compromised process. Applications remain responsible for secret injection, process permissions, and lifecycle.
 
 ## Endpoint and TLS controls

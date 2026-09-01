@@ -37,9 +37,18 @@ src/
     production.rs        optional Socket.IO transport
     testing.rs           deterministic fake transport
   testing.rs             feature-gated REST contract hooks
+examples/
+  support/mod.rs         shared environment parsing and documented authentication
+  *.rs                   explicit read/stream targets plus offline mutation construction
 ```
 
 Endpoint modules own their request and response types. `EndpointRequest` is sealed, so downstream crates can execute SDK requests but cannot invent a signed wire payload or assign it an unsafe retry/rate class. Signing, envelope classification, and third-party transport details stay private. `test-util` exposes only the controlled hooks needed by this repository's black-box contracts.
+
+Example targets validate every local argument and build their typed request
+before authentication or endpoint I/O. Their manifest declares whether each is
+read-only, read-only streaming, or offline. The offline mutation example has no
+client and demonstrates construction only; the fixture corpus rejects mutation
+dispatch from any example source.
 
 ## REST request flow
 

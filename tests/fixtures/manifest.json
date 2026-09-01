@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": {
     "documentation_url": "https://api.icicidirect.com/breezeapi/documents/index.html",
     "retrieved_at": "2026-08-29T16:18:00+05:30",
@@ -25,7 +25,18 @@
     "docs/TEST_STRATEGY.md",
     "docs/IMPLEMENTATION_PLAN.md",
     "docs/SECURITY.md",
-    "docs/KNOWN_LIMITATIONS.md"
+    "docs/KNOWN_LIMITATIONS.md",
+    "examples/README.md"
+  ],
+  "example_targets": [
+    {"name":"authenticate","path":"examples/authenticate.rs","required_features":[],"network_mode":"read_only"},
+    {"name":"historical_data","path":"examples/historical_data.rs","required_features":[],"network_mode":"read_only"},
+    {"name":"market_data","path":"examples/market_data.rs","required_features":[],"network_mode":"read_only"},
+    {"name":"account_portfolio","path":"examples/account_portfolio.rs","required_features":[],"network_mode":"read_only"},
+    {"name":"orders_and_trades","path":"examples/orders_and_trades.rs","required_features":[],"network_mode":"read_only"},
+    {"name":"risk_calculators","path":"examples/risk_calculators.rs","required_features":[],"network_mode":"read_only"},
+    {"name":"streaming","path":"examples/streaming.rs","required_features":["streaming"],"network_mode":"read_only_stream"},
+    {"name":"mutation_requests","path":"examples/mutation_requests.rs","required_features":[],"network_mode":"offline"}
   ],
   "rest_operations": [
     {"id":"auth.customer_details","section":"CustomerDetails / CustomerDetails","method":"GET","base":"rest_v1","path":"/customerdetails","auth":"session_exchange","response_fixture":"auth.customer_details"},

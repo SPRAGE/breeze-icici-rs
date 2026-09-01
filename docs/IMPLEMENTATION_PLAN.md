@@ -102,6 +102,7 @@ cargo test --test fixture_corpus
 cargo test --features sdk-contract --test sdk_contract
 cargo test --all-features
 cargo-nextest nextest run --all-features
+cargo check --all-features --examples
 cargo clippy --all-targets --all-features -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --all-features --no-deps
 nix flake check --no-write-lock-file

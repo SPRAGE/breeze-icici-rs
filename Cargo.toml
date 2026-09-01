@@ -20,6 +20,39 @@ tracing = ["dep:tracing"]
 test-util = []
 sdk-contract = ["test-util"]
 
+[[example]]
+name = "authenticate"
+path = "examples/authenticate.rs"
+
+[[example]]
+name = "historical_data"
+path = "examples/historical_data.rs"
+
+[[example]]
+name = "market_data"
+path = "examples/market_data.rs"
+
+[[example]]
+name = "account_portfolio"
+path = "examples/account_portfolio.rs"
+
+[[example]]
+name = "orders_and_trades"
+path = "examples/orders_and_trades.rs"
+
+[[example]]
+name = "risk_calculators"
+path = "examples/risk_calculators.rs"
+
+[[example]]
+name = "streaming"
+path = "examples/streaming.rs"
+required-features = ["streaming"]
+
+[[example]]
+name = "mutation_requests"
+path = "examples/mutation_requests.rs"
+
 [[test]]
 name = "fixture_corpus"
 path = "tests/fixture_corpus.rs"

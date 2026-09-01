@@ -14,8 +14,17 @@ struct Manifest {
     source: Source,
     documented_limits: DocumentedLimits,
     required_markdown: Vec<String>,
+    example_targets: Vec<ExampleTarget>,
     rest_operations: Vec<RestOperation>,
     streams: Vec<StreamFamily>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ExampleTarget {
+    name: String,
+    path: String,
+    required_features: Vec<String>,
+    network_mode: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -98,7 +107,7 @@ fn assert_lower_hex(value: &str, bytes: usize, label: &str) {
 fn source_revision_and_documented_limits_are_pinned() {
     let manifest: Manifest = read_json("manifest.json");
 
-    assert_eq!(manifest.schema_version, 1);
+    assert_eq!(manifest.schema_version, 2);
     assert_eq!(
         manifest.source.documentation_url,
         "https://api.icicidirect.com/breezeapi/documents/index.html"
@@ -126,6 +135,80 @@ fn source_revision_and_documented_limits_are_pinned() {
     );
     assert_eq!(manifest.documented_limits.timestamp_skew_seconds, 60);
     assert_eq!(manifest.documented_limits.stream_scripts, 2_000);
+}
+
+#[test]
+fn declared_examples_exist_compile_as_cargo_targets_and_never_dispatch_mutations() {
+    let root = repository_root();
+    let manifest: Manifest = read_json("manifest.json");
+    let cargo = fs::read_to_string(root.join("Cargo.toml")).expect("read Cargo.toml");
+
+    assert_eq!(manifest.example_targets.len(), 8);
+    let mut names = BTreeSet::new();
+    let mut paths = BTreeSet::new();
+    for example in &manifest.example_targets {
+        assert!(
+            names.insert(example.name.as_str()),
+            "duplicate example name"
+        );
+        assert!(
+            paths.insert(example.path.as_str()),
+            "duplicate example path"
+        );
+        assert!(
+            matches!(
+                example.network_mode.as_str(),
+                "read_only" | "read_only_stream" | "offline"
+            ),
+            "unknown example network mode {}",
+            example.network_mode
+        );
+
+        let path = root.join(&example.path);
+        assert!(path.is_file(), "example {} is missing", path.display());
+        let target = cargo
+            .split("[[example]]")
+            .find(|block| block.contains(&format!("name = {:?}", example.name)))
+            .unwrap_or_else(|| panic!("{} is not declared as a Cargo example", example.name));
+        assert!(target.contains(&format!("path = {:?}", example.path)));
+        for feature in &example.required_features {
+            assert!(
+                target.contains(&format!("required-features = [{feature:?}]")),
+                "{} does not require feature {}",
+                example.name,
+                feature
+            );
+        }
+    }
+
+    let offline = manifest
+        .example_targets
+        .iter()
+        .find(|example| example.name == "mutation_requests")
+        .expect("offline mutation-construction example");
+    assert_eq!(offline.network_mode, "offline");
+    let source = fs::read_to_string(root.join(&offline.path)).expect("read offline example");
+    assert!(!source.contains("BreezeClient"));
+    assert!(!source.contains("authenticated_client"));
+    assert!(!source.contains("reqwest"));
+    assert!(!source.contains("std::net"));
+    assert!(!source.contains("tokio"));
+
+    let mut example_files = Vec::new();
+    collect_files(&root.join("examples"), &mut example_files);
+    for path in example_files
+        .into_iter()
+        .filter(|path| path.extension().is_some_and(|value| value == "rs"))
+    {
+        let source = fs::read_to_string(&path).expect("read example source");
+        for dispatch in [".trading()", ".set_funds(", ".execute("] {
+            assert!(
+                !source.contains(dispatch),
+                "{} contains live mutation dispatch {dispatch}",
+                path.display()
+            );
+        }
+    }
 }
 
 #[test]

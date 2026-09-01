@@ -51,6 +51,15 @@ The reviewed reference page contains 27 REST operation sections, five streaming 
 
 The option-chain path is deliberately lowercase in the selected contract. The documentation table shows `/OptionChain`, while its own links and ICICI's maintained SDK also use lowercase. See the audit for this and other resolutions.
 
+## Example coverage
+
+The compile-checked [example suite](../examples/README.md) maps the official
+Python SDK README examples onto the typed Rust services above. Multiple Python
+snippets that differ only by instrument strings share one Rust example built on
+`Instrument`, so equity/future/option identity is validated rather than copied
+between samples. Mutation examples construct requests only and never dispatch
+them.
+
 ## Streaming families
 
 | Documentation section | Protocol contract | Implemented Rust surface | Status |

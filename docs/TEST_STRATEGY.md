@@ -6,8 +6,9 @@ The repository has two explicit contract entry points:
 
 | Command | Current local result | Purpose |
 |---|---|---|
-| `cargo test --test fixture_corpus` | 7 passing tests | Validates the source inventory, 27 REST/five stream fixture corpus, required documents, and synthetic-data boundary. |
+| `cargo test --test fixture_corpus` | 8 passing tests | Validates the source inventory, 27 REST/five stream fixture corpus, required documents, example inventory/safety boundary, and synthetic-data boundary. |
 | `cargo test --features sdk-contract --test sdk_contract` | 101 passing tests | Exercises the public API, exact wires, models, HTTP behavior, rate limits, stream codecs/lifecycle, parser, and compile-fail safety boundaries. |
+| `cargo check --all-features --examples` | 8 example targets compile | Type-checks authentication, read-only REST, streaming, and offline mutation-construction usage against the public API. |
 
 The five Trybuild cases have reviewed `.stderr` goldens. They fail for their intended reason: credentials are not serializable, pending clients cannot trade, cash instruments cannot gain expiry fields, market orders are not constructible, and downstream crates cannot implement the sealed signed-request contract.
 
@@ -37,6 +38,7 @@ All normal tests are hermetic. Wiremock tests bind only loopback ports and never
 | Stream memory growth or silent loss | Capacity/lag tests | `contract/streaming.rs` |
 | Security-master columns drift | Header/schema fixtures | `contract/instruments.rs` |
 | Docs and endpoint inventory diverge | Manifest completeness test | `fixture_corpus.rs` |
+| Examples disappear, embed credentials, or dispatch a live mutation | Manifest inventory, source safety scan, and Cargo example compilation | `fixture_corpus.rs`, `examples/` |
 
 ## Test layers
 
@@ -128,6 +130,7 @@ cargo test --features sdk-contract --test sdk_contract
 cargo test --all-features
 cargo test --doc --all-features
 cargo-nextest nextest run --all-features
+cargo check --all-features --examples
 cargo clippy --all-targets --all-features -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --all-features --no-deps
 cargo check --no-default-features --features rustls-tls

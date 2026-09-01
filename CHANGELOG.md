@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Added compile-checked Rust examples mapped to the official Python SDK example
+  corpus, with live reads bounded by explicit inputs and mutation examples kept
+  offline-only.
+
 ## [0.0.1] - 2026-08-30
 
 Initial experimental source release.

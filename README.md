@@ -90,6 +90,23 @@ for quote in quotes {
 # }
 ```
 
+## Examples
+
+The [`examples/`](examples/README.md) directory contains compile-checked,
+idiomatic counterparts to the official Python SDK examples. It covers browser
+authentication, historical CSV export, quotes and option chains, account and
+portfolio reads, order/trade reads, calculators, and every documented stream
+family.
+
+Live mutation calls are intentionally absent. The mutation example constructs
+validated set-funds, order, square-off, and GTT requests without authenticating
+or sending them.
+
+```console
+cargo check --all-features --examples
+cargo run --quiet --example historical_data > historical.csv
+```
+
 Mutations are deliberately grouped under clearly named methods such as `client.trading().place(request)` and `client.trading().cancel(request)`. The public order model has no market-order variant. Funds and trading mutations are never automatically retried after an ambiguous network write.
 
 ## Streaming
@@ -142,6 +159,7 @@ cargo fmt --all -- --check
 cargo test --test fixture_corpus
 cargo test --features sdk-contract --test sdk_contract
 cargo-nextest nextest run --all-features
+cargo check --all-features --examples
 cargo clippy --all-targets --all-features -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --all-features --no-deps
 nix flake check
