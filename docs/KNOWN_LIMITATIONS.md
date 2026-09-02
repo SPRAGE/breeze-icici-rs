@@ -11,6 +11,6 @@ The following areas require a tests-first hardening pass before production use o
 - production streaming and the fake lifecycle harness do not yet share one fault-injectable state machine, and no live Socket.IO handshake has been verified;
 - mutual-fund security-master rows are recognized but not currently materialized as instrument records;
 - a no-default-feature build has no TLS backend and needs a compile-time feature guard;
-- public API documentation, MSRV evidence, dependency policy, CI, and independent security/API review remain qualification gates.
+- public API documentation, hosted MSRV/CI evidence and enforcement, dependency policy, and independent security/API review remain qualification gates.
 
 No automated test or release procedure sends funds, orders, square-offs, or GTT mutations to a live account.

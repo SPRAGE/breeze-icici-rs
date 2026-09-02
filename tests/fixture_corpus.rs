@@ -477,6 +477,50 @@ fn all_required_markdown_exists_and_declares_the_preview_release_boundary() {
 }
 
 #[test]
+fn github_release_automation_keeps_registry_credentials_narrow() {
+    let root = repository_root();
+    let workflow_root = root.join(".github/workflows");
+
+    // Published crate archives intentionally omit repository automation.
+    if !workflow_root.is_dir() {
+        return;
+    }
+
+    let ci = fs::read_to_string(workflow_root.join("ci.yml")).expect("read CI workflow");
+    let publish =
+        fs::read_to_string(workflow_root.join("publish.yml")).expect("read publish workflow");
+
+    assert!(ci.contains("pull_request:"));
+    assert!(ci.contains("cargo +stable test --locked --all-features"));
+    assert!(ci.contains("cargo +1.85.0 check --locked --all-targets --all-features"));
+    assert!(ci.contains("actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"));
+    assert!(ci.contains("permissions:\n  contents: read"));
+    assert!(ci.contains("persist-credentials: false"));
+    assert!(!ci.contains("CARGO_REGISTRY_TOKEN"));
+    assert!(!ci.contains("pull_request_target"));
+
+    assert!(publish.contains("workflow_dispatch:"));
+    assert!(publish.contains("name: crates-io"));
+    assert!(publish.contains(
+        "if: github.repository == 'SPRAGE/breeze-icici-rs' && github.ref == 'refs/heads/main'"
+    ));
+    assert!(publish.contains("actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"));
+    assert!(publish.contains("permissions:\n  contents: read"));
+    assert!(publish.contains("ref: refs/tags/${{ steps.release.outputs.tag }}"));
+    assert!(publish.contains("cargo +1.85.0 publish --dry-run --locked --registry crates-io"));
+    assert!(publish.contains("cargo +1.85.0 publish --locked --no-verify --registry crates-io"));
+    assert!(publish.contains("secrets.CARGO_REGISTRY_TOKEN"));
+    assert!(publish.contains("actual_checksum"));
+    assert!(publish.contains("persist-credentials: false"));
+    assert!(!publish.contains("pull_request_target"));
+
+    let (before_publish, _) = publish
+        .split_once("- name: Publish to crates.io")
+        .expect("publish step must be explicit");
+    assert!(!before_publish.contains("CARGO_REGISTRY_TOKEN"));
+}
+
+#[test]
 fn fixtures_do_not_contain_values_copied_from_official_credential_examples() {
     let fixture_root = fixture_path("");
     let forbidden = [

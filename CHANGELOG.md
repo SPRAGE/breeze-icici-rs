@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Added least-privilege GitHub Actions CI and a manual, tagged crates.io
+  publication workflow with environment-scoped token handling and registry
+  checksum verification.
+
 ## [0.0.1] - 2026-08-30
 
 - Added compile-checked Rust examples mapped to the official Python SDK example

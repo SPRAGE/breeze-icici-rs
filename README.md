@@ -24,8 +24,9 @@ carefully controlled live read-only evaluation. It is **not production-ready**:
   reconnect, and soak qualification against ICICI;
 - funds, order, square-off, and GTT mutations have not been qualified for live
   use; and
-- CI, the declared MSRV, dependency policy, and independent
-  security/protocol review remain production-qualification gates.
+- hosted CI evidence and enforcement, the declared MSRV, dependency policy,
+  and independent security/protocol review remain production-qualification
+  gates.
 
 Before any production use, every user must independently review and test every
 endpoint, request variant, response shape, authentication path, error path,
@@ -202,6 +203,38 @@ nix flake check
 ```
 
 All normal tests use synthetic credentials and local mock transports. No test logs into ICICI, changes funds, places an order, or connects to a live feed.
+
+## CI and crates.io releases
+
+[GitHub Actions CI](.github/workflows/ci.yml) runs the full stable-toolchain
+verification suite on pull requests and `main`, and separately checks that
+every target compiles on the declared Rust 1.85 MSRV. CI never receives Breeze
+credentials or the crates.io token.
+
+Crate publication is a manual, environment-protected workflow. To configure it:
+
+1. In the GitHub repository, open **Settings → Environments** and create an
+   environment named `crates-io`.
+2. Add required reviewers to that environment and restrict deployments to the
+   default branch. Under **Environment secrets**, add a secret named
+   `CARGO_REGISTRY_TOKEN`.
+3. In **Settings → Rules → Rulesets**, protect tags matching `v*` from updates
+   and deletion.
+4. Use a crates.io token restricted to `breeze-icici`, with permission to
+   publish updates and an appropriate expiry. The token does not need owner,
+   yank, or new-crate permissions for future versions of this existing crate.
+5. Bump `Cargo.toml` and `CHANGELOG.md`, merge only after CI passes, create and
+   push an immutable `v<version>` tag for that exact commit, then run **Publish
+   crate** from the repository's Actions page. Select `main` as the workflow
+   source and enter `<version>` with no leading `v`.
+
+The release workflow checks out that tag, verifies it matches the manifest,
+rejects an already-published version, runs the complete tests, performs a
+lockfile-pinned dry run with Rust 1.85.0, rechecks that the source tree is
+unchanged, and only then exposes the environment secret to a non-building
+`cargo publish --no-verify` upload step. It verifies the public crates.io
+checksum after publication. The token is never written to the repository or a
+Cargo credentials file.
 
 ## Design and evidence
 

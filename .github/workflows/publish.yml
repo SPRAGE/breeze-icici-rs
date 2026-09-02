@@ -1,0 +1,156 @@
+name: Publish crate
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to publish, without the leading v (for example, 0.0.2)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crates-io-publish
+  cancel-in-progress: false
+
+env:
+  CARGO_INCREMENTAL: "0"
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    name: Publish v${{ inputs.version }}
+    if: github.repository == 'SPRAGE/breeze-icici-rs' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: crates-io
+      url: https://crates.io/crates/breeze-icici/${{ inputs.version }}
+    steps:
+      - name: Validate the version input
+        id: release
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "version must be a Cargo-compatible semantic version without a leading v" >&2
+            exit 1
+          fi
+          printf 'tag=v%s\n' "$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the release tag
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: refs/tags/${{ steps.release.outputs.tag }}
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends jq libssl-dev pkg-config
+
+      - name: Install verification and release Rust toolchains
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup toolchain install 1.85.0 --profile minimal
+
+      - name: Verify tag and manifest provenance
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          tag_commit="$(git rev-list -n 1 "refs/tags/v${RELEASE_VERSION}")"
+          head_commit="$(git rev-parse HEAD)"
+          manifest_version="$(cargo +1.85.0 metadata --locked --no-deps --format-version 1 | jq -r '.packages[0].version')"
+          test "$tag_commit" = "$head_commit"
+          test "$manifest_version" = "$RELEASE_VERSION"
+          test -z "$(git status --porcelain)"
+
+      - name: Ensure the version is not already published
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          status="$(curl --silent --show-error \
+            --user-agent breeze-icici-github-release/1 \
+            --output /tmp/crates-io-version.json \
+            --write-out '%{http_code}' \
+            "https://crates.io/api/v1/crates/breeze-icici/${RELEASE_VERSION}")"
+          case "$status" in
+            404) ;;
+            200)
+              echo "breeze-icici ${RELEASE_VERSION} is already published" >&2
+              exit 1
+              ;;
+            *)
+              echo "crates.io preflight returned HTTP ${status}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Check the tagged source at the declared MSRV
+        run: cargo +1.85.0 check --locked --all-targets --all-features
+
+      - name: Test the tagged source
+        run: cargo +stable test --locked --all-features
+
+      - name: Verify the package without publishing
+        id: package
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          cargo +1.85.0 publish --dry-run --locked --registry crates-io
+          crate_path="target/package/breeze-icici-${RELEASE_VERSION}.crate"
+          test -f "$crate_path"
+          test -z "$(git status --porcelain)"
+          checksum="$(sha256sum "$crate_path" | awk '{print $1}')"
+          printf 'checksum=%s\n' "$checksum" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to crates.io
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${CARGO_REGISTRY_TOKEN:-}"
+          cargo +1.85.0 publish --locked --no-verify --registry crates-io
+
+      - name: Verify the public registry artifact
+        shell: bash
+        env:
+          EXPECTED_CHECKSUM: ${{ steps.package.outputs.checksum }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          for _ in 1 2 3 4 5 6; do
+            status="$(curl --silent --show-error \
+              --user-agent breeze-icici-github-release/1 \
+              --output /tmp/crates-io-version.json \
+              --write-out '%{http_code}' \
+              "https://crates.io/api/v1/crates/breeze-icici/${RELEASE_VERSION}")"
+            if [[ "$status" == 200 ]]; then
+              actual_checksum="$(jq -r '.version.checksum // empty' /tmp/crates-io-version.json)"
+              test "$actual_checksum" = "$EXPECTED_CHECKSUM"
+              jq -e --arg version "$RELEASE_VERSION" \
+                '.version.num == $version and .version.yanked == false and .version.license == "Apache-2.0"' \
+                /tmp/crates-io-version.json >/dev/null
+              {
+                echo "Published [breeze-icici ${RELEASE_VERSION}](https://crates.io/crates/breeze-icici/${RELEASE_VERSION})."
+                echo
+                echo "Registry checksum: \`${actual_checksum}\`"
+                echo "Source commit: \`$(git rev-parse HEAD)\`"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "published version did not become visible through the crates.io API" >&2
+          exit 1

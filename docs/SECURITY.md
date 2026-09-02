@@ -110,3 +110,19 @@ SetFunds and order/GTT/square-off mutations must never be automated as release p
 ## Security qualification work still open
 
 Version `0.0.1` is distributed under Apache-2.0 as an explicitly experimental preview. Crates.io publication does not close the remaining security work: enforce a dependency/vulnerability policy, review the native-TLS streaming dependency, establish an agreed security-reporting channel, run the declared MSRV, and perform an independent public API/security review before any stable or production-readiness claim.
+
+## Release credential handling
+
+The GitHub publication workflow uses the protected `crates-io` Environment and
+reads `CARGO_REGISTRY_TOKEN` only in the final publish step. Pull-request and CI
+jobs never reference registry or Breeze secrets. The crates.io token should be
+scoped only to publishing updates for `breeze-icici`, given a finite expiry,
+and rotated immediately after suspected exposure.
+
+Publication remains manual and tag-bound. Protect `v*` tags from updates and
+deletion with a GitHub ruleset, require an environment reviewer, and never use
+`pull_request_target` with repository or environment secrets. A dry run and
+the complete hermetic suite precede token exposure. The final upload uses
+`--no-verify` so build scripts cannot run with the token after the already
+verified tree and package have been proven unchanged; the public registry
+checksum is verified afterward.

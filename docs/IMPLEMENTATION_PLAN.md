@@ -85,7 +85,7 @@ These actions require evidence or choices beyond local implementation and must r
 2. **Dependency policy:** choose license/vulnerability policy and add `cargo-deny`/audit configuration; review the native-TLS streaming dependency.
 3. **Public metadata:** crate name `breeze-icici`, Apache-2.0, repository URL, and preview version `0.0.1` are selected; a stable semver support policy remains open.
 4. **API review:** run an independent semver/public-surface review before any stable release.
-5. **CI:** add an approved CI workflow covering formatting, default/native/all-feature builds, tests, Clippy, docs, MSRV, and dependency policy.
+5. **CI:** GitHub Actions definitions now cover formatting, default/native/all-feature builds, tests, Clippy, docs, packaging, and MSRV compilation. Hosted-run evidence, branch/tag rulesets, environment approval, and a dependency policy remain external activation and qualification steps.
 6. **Live read-only compatibility:** only with account-owner authorization, use secret injection and a strict allowlist to check CustomerDetails/read endpoints and stream handshakes; sanitize and bind the result to an immutable commit.
 7. **Publication:** explicitly authorized for `0.0.1`; verify the registry artifact separately from source/build proof.
 
