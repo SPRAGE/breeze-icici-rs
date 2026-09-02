@@ -4,6 +4,42 @@ An experimental async, typed Rust SDK for the ICICI Direct Breeze REST and Socke
 
 Version `0.0.1` is a source-only preview exercised by a hermetic fixture and mock-transport suite. It has **not** been validated against a live Breeze account, published to crates.io, or qualified for unattended production trading. `publish = false` remains intentional. Review the [known limitations](docs/KNOWN_LIMITATIONS.md) before using it against a broker account.
 
+## Production readiness and AI-generated-code notice
+
+> [!WARNING]
+> This codebase is AI-generated. Automated tests and source review can reduce
+> risk, but they cannot guarantee that the implementation is correct, secure,
+> complete, or compatible with ICICI Direct's current production service. Do
+> not use this SDK for unattended or real-money production trading without an
+> independent review and application-specific testing.
+
+The SDK is currently suitable for local development, mock integration, and a
+carefully controlled live read-only evaluation. It is **not production-ready**:
+
+- one-to-one functional parity with the official Python SDK has not yet been
+  demonstrated;
+- the REST contracts are based on captured documentation and synthetic
+  fixtures, not a sanitized live compatibility suite bound to this commit;
+- the production Socket.IO adapter has not completed a live handshake,
+  reconnect, and soak qualification against ICICI;
+- funds, order, square-off, and GTT mutations have not been qualified for live
+  use; and
+- CI, the declared MSRV, dependency policy, licensing, and independent
+  security/protocol review remain release gates.
+
+Before any production use, every user must independently review and test every
+endpoint, request variant, response shape, authentication path, error path,
+rate limit, reconnect path, and mutation-reconciliation workflow their
+application will rely on. Testing should progress from mocks to explicitly
+authorized live read-only checks and then to separately controlled mutation
+canaries with monitoring and reconciliation. Passing this repository's tests
+does not transfer responsibility for validating the SDK, the application using
+it, or the financial consequences of either.
+
+See the [known limitations](docs/KNOWN_LIMITATIONS.md), [test evidence and live
+boundary](docs/TEST_STRATEGY.md), and [release qualification
+plan](docs/IMPLEMENTATION_PLAN.md) for the current acceptance gaps.
+
 ## What is implemented
 
 - Browser login URL generation, CustomerDetails session exchange, and restored sessions.
