@@ -492,8 +492,8 @@ fn github_release_automation_keeps_registry_credentials_narrow() {
 
     assert!(ci.contains("pull_request:"));
     assert!(ci.contains("cargo +stable test --locked --all-features"));
-    assert!(ci.contains("cargo +1.85.0 check --locked --all-targets --all-features"));
-    assert!(ci.contains("actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"));
+    assert!(ci.contains("cargo +1.85.0 check --locked --lib --all-features"));
+    assert!(ci.contains("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"));
     assert!(ci.contains("permissions:\n  contents: read"));
     assert!(ci.contains("persist-credentials: false"));
     assert!(!ci.contains("CARGO_REGISTRY_TOKEN"));
@@ -504,7 +504,7 @@ fn github_release_automation_keeps_registry_credentials_narrow() {
     assert!(publish.contains(
         "if: github.repository == 'SPRAGE/breeze-icici-rs' && github.ref == 'refs/heads/main'"
     ));
-    assert!(publish.contains("actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"));
+    assert!(publish.contains("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"));
     assert!(publish.contains("permissions:\n  contents: read"));
     assert!(publish.contains("ref: refs/tags/${{ steps.release.outputs.tag }}"));
     assert!(publish.contains("cargo +1.85.0 publish --dry-run --locked --registry crates-io"));

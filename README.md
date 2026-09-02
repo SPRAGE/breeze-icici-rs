@@ -208,8 +208,9 @@ All normal tests use synthetic credentials and local mock transports. No test lo
 
 [GitHub Actions CI](.github/workflows/ci.yml) runs the full stable-toolchain
 verification suite on pull requests and `main`, and separately checks that
-every target compiles on the declared Rust 1.85 MSRV. CI never receives Breeze
-credentials or the crates.io token.
+the published library compiles with every production feature on the declared
+Rust 1.85 MSRV. Test-only dependencies are tested on stable and do not define
+the crate's MSRV. CI never receives Breeze credentials or the crates.io token.
 
 Crate publication is a manual, environment-protected workflow. To configure it:
 
