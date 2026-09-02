@@ -4,17 +4,16 @@
 
 The documentation/tests-first stop gate was lifted by the user and milestones 1–7 have an initial implementation. The selected 27-operation wire and response corpus, compile-fail boundaries, mocked Reqwest behavior, security-master parser, stream codecs, and deterministic stream lifecycle are green locally. The canonical fixtures do not cover every documented request variant; the remaining gaps are tracked in `KNOWN_LIMITATIONS.md`.
 
-This is not the same as a public or production release:
+Crates.io distribution of this experimental preview is not the same as production qualification:
 
 - no live Breeze credential or account was used;
 - no live Socket.IO handshake was attempted;
 - no funds or trading mutation was sent;
-- no crate was published to crates.io;
-- the source package is named `breeze-icici` and versioned `0.0.1`;
-- license and semver/dependency policies remain user decisions;
+- crates.io distribution has been explicitly authorized for package `breeze-icici` version `0.0.1`;
+- Apache-2.0 is the selected license, while stable semver and dependency policies remain open;
 - the declared Rust 1.85 MSRV still needs a real 1.85 toolchain run.
 
-`Cargo.toml` therefore uses preview version `0.0.1` and retains `publish = false`.
+`Cargo.toml` therefore enables publication only for experimental preview version `0.0.1`; distribution is not a live-compatibility or production claim.
 
 ## Local definition of done
 
@@ -78,17 +77,17 @@ Proof: production feature compilation and deterministic fake-transport lifecycle
 
 No live handshake claim is made.
 
-## Milestone 8: release qualification — intentionally open
+## Milestone 8: stable and production qualification — intentionally open
 
 These actions require evidence or choices beyond local implementation and must remain separate:
 
 1. **MSRV:** run the complete relevant suite with Rust 1.85, then keep or raise `rust-version` from evidence.
 2. **Dependency policy:** choose license/vulnerability policy and add `cargo-deny`/audit configuration; review the native-TLS streaming dependency.
-3. **Public metadata:** approve crate name, license, repository URL, initial version, and semver support policy.
-4. **API review:** run a semver/public-surface review after those decisions and before setting `publish = true`.
+3. **Public metadata:** crate name `breeze-icici`, Apache-2.0, repository URL, and preview version `0.0.1` are selected; a stable semver support policy remains open.
+4. **API review:** run an independent semver/public-surface review before any stable release.
 5. **CI:** add an approved CI workflow covering formatting, default/native/all-feature builds, tests, Clippy, docs, MSRV, and dependency policy.
 6. **Live read-only compatibility:** only with account-owner authorization, use secret injection and a strict allowlist to check CustomerDetails/read endpoints and stream handshakes; sanitize and bind the result to an immutable commit.
-7. **Publication:** perform only on an explicit request, then verify the registry artifact separately from source/build proof.
+7. **Publication:** explicitly authorized for `0.0.1`; verify the registry artifact separately from source/build proof.
 
 Automated live funds/order/GTT/square-off mutations are not a release gate.
 

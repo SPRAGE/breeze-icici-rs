@@ -107,6 +107,6 @@ The normal suite is hermetic. No live compatibility run has been performed. Befo
 
 SetFunds and order/GTT/square-off mutations must never be automated as release probes.
 
-## Publication security work still open
+## Security qualification work still open
 
-Before publication, choose and enforce a license/dependency/vulnerability policy, review the native-TLS streaming dependency, establish an agreed security-reporting channel, run the declared MSRV, and perform an independent public API/security review. Until those decisions exist, `publish = false` is the correct boundary.
+Version `0.0.1` is distributed under Apache-2.0 as an explicitly experimental preview. Crates.io publication does not close the remaining security work: enforce a dependency/vulnerability policy, review the native-TLS streaming dependency, establish an agreed security-reporting channel, run the declared MSRV, and perform an independent public API/security review before any stable or production-readiness claim.

@@ -84,7 +84,7 @@ REST and streaming share credentials and domain types, but their lifecycle, reco
 6. Pure decoders for every reviewed stream family.
 7. Feature-gated production Socket.IO adapter plus deterministic subscription, reconnect, unsubscribe, shutdown, and lag contracts.
 
-Public-release qualification remains a separate milestone because it needs user decisions and external evidence, not more guessed implementation. See `IMPLEMENTATION_PLAN.md`.
+Stable and production qualification remains a separate milestone because it needs external evidence, not more guessed implementation. Crates.io distribution of the experimental preview does not change that boundary. See `IMPLEMENTATION_PLAN.md`.
 
 ## Risks and unresolved external facts
 
@@ -97,7 +97,7 @@ Public-release qualification remains a separate milestone because it needs user 
 | Local limits do not coordinate separate clients/processes. | Document them as per-client safety rails; require an application-level coordinator where needed. |
 | Broker-side mutation idempotency is undocumented. | Never automatically retry mutations; return `AmbiguousMutation` after uncertain send-phase failures. |
 | Preview/error/empty-result live shapes may differ from repaired samples. | Keep normalized source fixtures and require authorized read-only evidence before a stable release claim. |
-| License, semver, and dependency policy are undecided. | Keep preview version `0.0.1` and `publish = false`; the source package name is `breeze-icici`. |
+| Stable semver and dependency policies are undecided. | Distribute preview version `0.0.1` as `breeze-icici` under Apache-2.0 without a stable or production-readiness claim. |
 
 ## Decisions fixed by the current contract
 

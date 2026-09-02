@@ -1,13 +1,13 @@
 # breeze-icici
 
-Async Rust SDK for the ICICI Direct Breeze REST and Socket.IO APIs. It is hermetically verified, not live-qualified or published to crates.io.
+Async Rust SDK for ICICI Direct Breeze REST and Socket.IO. Version `0.0.1` is an Apache-2.0 experimental crate: hermetically tested, not live-qualified or production-ready.
 
 ## Work here
 
 - Enter `nix develop`; read `README.md` and the audit/architecture docs before changing public or wire behavior.
 - Preserve exact compact v1 JSON, including GET/DELETE bodies. Historical v2 is a separate query/header protocol.
 - Keep local proof separate from live compatibility, publication, and production readiness.
-- Rust 2024, declared MSRV 1.85, Rustls-default REST, optional `rust_socketio`; version `0.0.1`, `publish = false`.
+- Rust 2024, MSRV 1.85, Rustls-default REST, optional `rust_socketio`; `0.0.1`, Apache-2.0, publishable.
 
 ```console
 cargo test --test fixture_corpus
@@ -27,4 +27,4 @@ python .ai/generators/compile.py --check
 - Security-master parsing is reader-only. Streams are bounded; production streaming has no live proof.
 - Tests use synthetic credentials and loopback/fakes. Never automate live funds or trading mutations.
 
-Do not add live credentials, probe, publish, or claim MSRV/live/production compatibility without the decisions and evidence required by `docs/IMPLEMENTATION_PLAN.md`.
+No live credentials, probes, or production claims. Publishing another version requires the decisions and evidence in `docs/IMPLEMENTATION_PLAN.md`.

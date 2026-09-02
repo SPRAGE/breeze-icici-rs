@@ -465,12 +465,14 @@ fn all_required_markdown_exists_and_declares_the_preview_release_boundary() {
     let readme = fs::read_to_string(root.join("README.md")).expect("read README");
     assert!(readme.contains("Version `0.0.1` is a source-only preview"));
     assert!(readme.contains("known limitations"));
-    assert!(readme.contains("publish = false"));
+    assert!(readme.contains("This codebase is AI-generated"));
+    assert!(readme.contains("Distribution through crates.io is for evaluation"));
+    assert!(readme.contains("not production-ready"));
     let plan = fs::read_to_string(root.join("docs/IMPLEMENTATION_PLAN.md")).expect("read plan");
-    assert!(plan.contains("Milestone 8: release qualification — intentionally open"));
+    assert!(plan.contains("Milestone 8: stable and production qualification — intentionally open"));
     let limitations =
         fs::read_to_string(root.join("docs/KNOWN_LIMITATIONS.md")).expect("read known limitations");
-    assert!(limitations.contains("before crates.io publication or production use"));
+    assert!(limitations.contains("before production use or a stable release"));
     assert!(root.join("src/lib.rs").is_file());
 }
 

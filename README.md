@@ -2,7 +2,7 @@
 
 An experimental async, typed Rust SDK for the ICICI Direct Breeze REST and Socket.IO APIs.
 
-Version `0.0.1` is a source-only preview exercised by a hermetic fixture and mock-transport suite. It has **not** been validated against a live Breeze account, published to crates.io, or qualified for unattended production trading. `publish = false` remains intentional. Review the [known limitations](docs/KNOWN_LIMITATIONS.md) before using it against a broker account.
+Version `0.0.1` is a source-only preview exercised by a hermetic fixture and mock-transport suite. It has **not** been validated against a live Breeze account or qualified for unattended production trading. Distribution through crates.io is for evaluation and does not imply production readiness. Review the [known limitations](docs/KNOWN_LIMITATIONS.md) before using it against a broker account.
 
 ## Production readiness and AI-generated-code notice
 
@@ -24,8 +24,8 @@ carefully controlled live read-only evaluation. It is **not production-ready**:
   reconnect, and soak qualification against ICICI;
 - funds, order, square-off, and GTT mutations have not been qualified for live
   use; and
-- CI, the declared MSRV, dependency policy, licensing, and independent
-  security/protocol review remain release gates.
+- CI, the declared MSRV, dependency policy, and independent
+  security/protocol review remain production-qualification gates.
 
 Before any production use, every user must independently review and test every
 endpoint, request variant, response shape, authentication path, error path,
@@ -223,4 +223,9 @@ The official prose and maintained SDK disagree in several places. The selected b
 
 ## Release boundary
 
-The local implementation can be qualified without broadening authority. A public release still requires explicit decisions on crate name, license, version/semver policy, dependency policy, and publication. Production compatibility additionally requires user-authorized, sanitized live read-only checks. Live mutations are never an automated release gate.
+Crates.io publication is a distribution event, not evidence of live compatibility or production readiness. Production compatibility additionally requires user-authorized, sanitized live read-only checks, application-level rate coordination and reconciliation, and independent review. Live mutations are never an automated release gate.
+
+## License
+
+Licensed under the Apache License, Version 2.0. See
+[`LICENSE-APACHE`](LICENSE-APACHE).

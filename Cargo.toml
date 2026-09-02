@@ -3,9 +3,24 @@ name = "breeze-icici"
 version = "0.0.1"
 edition = "2024"
 rust-version = "1.85"
-publish = false
+publish = true
 description = "Async, typed Rust SDK for the ICICI Direct Breeze API"
 repository = "https://github.com/SPRAGE/breeze-icici-rs"
+documentation = "https://docs.rs/breeze-icici"
+readme = "README.md"
+license = "Apache-2.0"
+keywords = ["icici", "breeze", "trading", "brokerage", "finance"]
+include = [
+    "/src/**",
+    "/examples/**",
+    "/tests/**",
+    "/docs/**",
+    "/Cargo.toml",
+    "/Cargo.lock",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE-APACHE",
+]
 autobins = false
 autoexamples = false
 autobenches = false
