@@ -1,6 +1,6 @@
 # Known limitations
 
-Version `0.0.1` is an experimental source release. Its hermetic tests prove the selected canonical fixtures and local safety behavior; they do not prove every documented variant or live ICICI Direct compatibility.
+Version `0.0.2` is an experimental source release. Its hermetic tests prove the selected canonical fixtures and local safety behavior; they do not prove every documented variant or live ICICI Direct compatibility.
 
 The following areas require a tests-first hardening pass before production use or a stable release:
 

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-09-02
+
+- Added `SessionToken::expose_for_persistence()` for applications to copy a
+  CustomerDetails session token directly into encrypted storage. The accessor
+  intentionally exposes secret material, while `Debug` redaction,
+  non-serialization, and owned-string zeroization remain unchanged.
 - Added least-privilege GitHub Actions CI and a manual, tagged crates.io
   publication workflow with environment-scoped token handling and registry
   checksum verification.
@@ -24,3 +30,4 @@ All notable changes to this project will be documented in this file.
 - Added an explicit production-readiness and AI-generated-code warning.
 
 [0.0.1]: https://github.com/SPRAGE/breeze-icici-rs/releases/tag/v0.0.1
+[0.0.2]: https://github.com/SPRAGE/breeze-icici-rs/compare/v0.0.1...v0.0.2

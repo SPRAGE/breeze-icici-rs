@@ -97,7 +97,7 @@ Stable and production qualification remains a separate milestone because it need
 | Local limits do not coordinate separate clients/processes. | Document them as per-client safety rails; require an application-level coordinator where needed. |
 | Broker-side mutation idempotency is undocumented. | Never automatically retry mutations; return `AmbiguousMutation` after uncertain send-phase failures. |
 | Preview/error/empty-result live shapes may differ from repaired samples. | Keep normalized source fixtures and require authorized read-only evidence before a stable release claim. |
-| Stable semver and dependency policies are undecided. | Distribute preview version `0.0.1` as `breeze-icici` under Apache-2.0 without a stable or production-readiness claim. |
+| Stable semver and dependency policies are undecided. | Version `0.0.2` is an experimental `breeze-icici` preview under Apache-2.0 without a stable or production-readiness claim. |
 
 ## Decisions fixed by the current contract
 

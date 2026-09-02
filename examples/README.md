@@ -151,7 +151,7 @@ The limit-price calculator additionally requires
 cargo run --example risk_calculators -- limit-price
 ```
 
-Unlike the Python example's empty strings, version 0.0.1 requires a non-empty
+Unlike the Python example's empty strings, version 0.0.2 requires a non-empty
 order reference and positive available quantity. This known modeling limitation
 is not hidden by substituting invented values.
 

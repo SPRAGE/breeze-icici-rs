@@ -22,6 +22,10 @@ It cannot secure a compromised process, store credentials for the application, r
 - Secret storage zeroizes its owned string on drop; the decoded base64 intermediate is also zeroized.
 - Secret types and `Credentials` deliberately do not implement Serde serialization.
 - Their `Debug` representations are fixed redaction markers. They do not implement a value-bearing `Display`.
+- `SessionToken::expose_for_persistence()` intentionally returns plaintext only
+  for an application's immediate encrypted persistence operation. It does not
+  add `Serialize` or `Display`; callers must not log, format, serialize, or
+  retain its returned value outside that secure-storage boundary.
 - Errors are bounded and scrubbed against the known app key, secret key, session token, and API session before returning from client operations.
 - Signing borrows secret text and never sends the Secret Key.
 - Normal tracing never logs headers, bodies, URLs, credentials, response bodies, or stream auth payloads.
@@ -109,7 +113,7 @@ SetFunds and order/GTT/square-off mutations must never be automated as release p
 
 ## Security qualification work still open
 
-Version `0.0.1` is distributed under Apache-2.0 as an explicitly experimental preview. Crates.io publication does not close the remaining security work: enforce a dependency/vulnerability policy, review the native-TLS streaming dependency, establish an agreed security-reporting channel, run the declared MSRV, and perform an independent public API/security review before any stable or production-readiness claim.
+Version `0.0.2` is an Apache-2.0 experimental preview. Registry distribution does not close the remaining security work: enforce a dependency/vulnerability policy, review the native-TLS streaming dependency, establish an agreed security-reporting channel, run the declared MSRV, and perform an independent public API/security review before any stable or production-readiness claim.
 
 ## Release credential handling
 

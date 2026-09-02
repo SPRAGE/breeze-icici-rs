@@ -1,13 +1,13 @@
 # breeze-icici
 
-Async Rust SDK for ICICI Direct Breeze REST and Socket.IO. Version `0.0.1` is an Apache-2.0 experimental crate: hermetically tested, not live-qualified or production-ready.
+Async Rust SDK for ICICI Direct Breeze. Version `0.0.2` is an Apache-2.0 preview: hermetically tested, not live-qualified or production-ready.
 
 ## Work here
 
 - Enter `nix develop`; read `README.md` and the audit/architecture docs before changing public or wire behavior.
 - Preserve exact compact v1 JSON, including GET/DELETE bodies. Historical v2 is a separate query/header protocol.
 - Keep local proof separate from live compatibility, publication, and production readiness.
-- Rust 2024, MSRV 1.85, Rustls-default REST, optional `rust_socketio`; `0.0.1`, Apache-2.0, publishable.
+- Rust 2024, MSRV 1.85, Rustls-default REST, optional `rust_socketio`; `0.0.2`, Apache-2.0, controlled publication.
 
 ```console
 cargo test --test fixture_corpus

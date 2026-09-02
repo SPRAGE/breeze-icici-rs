@@ -92,6 +92,13 @@ fn stream_credentials_decode_exactly_one_user_and_token() {
 }
 
 #[test]
+fn session_token_exposes_exact_secret_only_for_persistence() {
+    let token = SessionToken::new(SESSION_TOKEN).unwrap();
+
+    assert_eq!(token.expose_for_persistence(), SESSION_TOKEN);
+}
+
+#[test]
 fn malformed_stream_session_tokens_are_typed_errors_and_redacted() {
     for value in [
         "",

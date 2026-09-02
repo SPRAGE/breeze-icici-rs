@@ -21,6 +21,12 @@ async fn main() -> Result<(), AnyError> {
     let pending = BreezeClient::builder(credentials).build_pending()?;
     let (_client, customer) = pending.authenticate(api_session).await?;
 
+    // Encrypt and persist this secret immediately using your application's
+    // secure store; never log or otherwise serialize the plaintext value.
+    let _session_token_for_encrypted_storage = customer
+        .session_token()
+        .ok_or_else(|| support::input_error("CustomerDetails did not return a session token"))?
+        .expose_for_persistence();
     println!("Authenticated Breeze user {}", customer.user_id().as_str());
     Ok(())
 }

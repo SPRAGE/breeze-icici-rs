@@ -2,7 +2,7 @@
 
 An experimental async, typed Rust SDK for the ICICI Direct Breeze REST and Socket.IO APIs.
 
-Version `0.0.1` is a source-only preview exercised by a hermetic fixture and mock-transport suite. It has **not** been validated against a live Breeze account or qualified for unattended production trading. Distribution through crates.io is for evaluation and does not imply production readiness. Review the [known limitations](docs/KNOWN_LIMITATIONS.md) before using it against a broker account.
+Version `0.0.2` is a source-only preview exercised by a hermetic fixture and mock-transport suite. It has **not** been validated against a live Breeze account or qualified for unattended production trading. Registry distribution is for evaluation and does not imply production readiness. Review the [known limitations](docs/KNOWN_LIMITATIONS.md) before using it against a broker account.
 
 ## Production readiness and AI-generated-code notice
 
@@ -78,6 +78,13 @@ let api_session = ApiSession::new(std::env::var("BREEZE_API_SESSION")?)?;
 let pending = BreezeClient::builder(credentials).build_pending()?;
 let (client, customer) = pending.authenticate(api_session).await?;
 
+// This is secret material: encrypt and persist it immediately, then discard
+// the plaintext copy. `SessionToken` never implements `Display` or Serde.
+let session_token_for_encrypted_storage = customer
+    .session_token()
+    .ok_or_else(|| std::io::Error::other("CustomerDetails response did not include a session token"))?
+    .expose_for_persistence();
+
 println!("authenticated user: {}", customer.user_id().as_str());
 let funds = client.account().funds().await?;
 println!("unallocated balance: {}", funds.unallocated_balance());
@@ -104,6 +111,12 @@ let client = BreezeClient::builder(credentials)
 ```
 
 Credential types redact `Debug`, are not serializable, and are zeroized when their owned storage is dropped. Applications remain responsible for secure secret storage and process-level access control.
+
+`SessionToken::expose_for_persistence()` is intentionally the only public
+session-token plaintext accessor. It exists so applications can encrypt the
+CustomerDetails result for later restoration; callers must treat its return
+value as a secret and must not log, format, serialize, or retain it outside the
+secure-storage operation.
 
 ## Calling APIs
 

@@ -190,7 +190,7 @@ async fn pending_client_exchanges_api_session_and_can_then_execute_signed_calls(
         .respond_with(
             ResponseTemplate::new(200).set_body_bytes(response_fixture("account.get_funds")),
         )
-        .expect(1)
+        .expect(2)
         .mount(&server)
         .await;
 
@@ -205,8 +205,31 @@ async fn pending_client_exchanges_api_session_and_can_then_execute_signed_calls(
         .unwrap();
 
     assert_eq!(customer.user_id().as_str(), "USER-TEST");
+    let persisted_session_token = customer
+        .session_token()
+        .expect("CustomerDetails fixture has a session token")
+        .expose_for_persistence()
+        .to_owned();
+    assert_eq!(persisted_session_token, crate::support::SESSION_TOKEN);
     assert_eq!(
         authenticated
+            .account()
+            .funds()
+            .await
+            .unwrap()
+            .unallocated_balance()
+            .to_string(),
+        "87500"
+    );
+
+    let restored = BreezeClient::builder(credentials())
+        .clock(Arc::new(FixedClock::new(fixed_time())))
+        .endpoints(production_shape_test_endpoints(&server.uri()))
+        .session_token(SessionToken::new(persisted_session_token).unwrap())
+        .build()
+        .unwrap();
+    assert_eq!(
+        restored
             .account()
             .funds()
             .await

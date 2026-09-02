@@ -130,6 +130,16 @@ impl StreamCredentials {
 }
 
 impl SessionToken {
+    /// Returns the session-token secret for immediate encrypted persistence.
+    ///
+    /// This deliberately exposes credential material. Copy it directly into a
+    /// secure, encrypted store and do not log, format, serialize, or retain it
+    /// longer than that operation requires. The returned borrow is valid only
+    /// while this `SessionToken` remains alive.
+    pub fn expose_for_persistence(&self) -> &str {
+        self.expose()
+    }
+
     pub fn stream_credentials(&self) -> Result<StreamCredentials, Error> {
         let decoded = base64::engine::general_purpose::STANDARD
             .decode(self.expose())

@@ -201,4 +201,4 @@ The mutual-fund archive is recognized, but its schema does not produce the same 
 
 Changing exact serialization, validation meaning, default retry/rate/deadline policy, or error categorization is semver-significant. Adding response accessors or preserved unknown values can be additive. Public request fields remain private so upstream additions can be incorporated without exposing invalid struct literals.
 
-Preview version `0.0.1` is distributed under Apache-2.0. Registry availability deliberately remains separate from a stable or production-readiness claim. MSRV, dependency policy, remaining contract hardening, live read-only compatibility, CI, and independent review are qualification gates described in `IMPLEMENTATION_PLAN.md`.
+Preview version `0.0.2` is an Apache-2.0 experimental release. Registry availability deliberately remains separate from a stable or production-readiness claim. MSRV, dependency policy, remaining contract hardening, live read-only compatibility, CI, and independent review are qualification gates described in `IMPLEMENTATION_PLAN.md`.

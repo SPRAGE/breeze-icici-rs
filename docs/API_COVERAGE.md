@@ -4,7 +4,7 @@
 
 The reviewed reference page contains 27 REST operation sections, five streaming families, and global contracts for login, signing, errors, instruments, limits, and regulatory restrictions. The table below accounts for every one of them.
 
-“Contract green” means one selected canonical request and normalized response shape pass the hermetic black-box suite. It does **not** mean every documented variant is implemented or that the behavior has been live-verified against the current broker service. See `KNOWN_LIMITATIONS.md` for the gaps known at version `0.0.1`.
+“Contract green” means one selected canonical request and normalized response shape pass the hermetic black-box suite. It does **not** mean every documented variant is implemented or that the behavior has been live-verified against the current broker service. See `KNOWN_LIMITATIONS.md` for the gaps known at version `0.0.2`.
 
 ## Global contracts
 
