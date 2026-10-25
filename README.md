@@ -2,7 +2,7 @@
 
 An experimental async, typed Rust SDK for the ICICI Direct Breeze REST and Socket.IO APIs.
 
-Version `0.0.2` is a source-only preview exercised by a hermetic fixture and mock-transport suite. It has **not** been validated against a live Breeze account or qualified for unattended production trading. Registry distribution is for evaluation and does not imply production readiness. Review the [known limitations](docs/KNOWN_LIMITATIONS.md) before using it against a broker account.
+Version `0.0.3` is an experimental preview exercised by a hermetic fixture and mock-transport suite. It has **not** been validated against a live Breeze account or qualified for unattended production trading. Registry distribution is for evaluation and does not imply production readiness. Review the [known limitations](docs/KNOWN_LIMITATIONS.md) before using it against a broker account.
 
 ## Production readiness and AI-generated-code notice
 
@@ -54,6 +54,10 @@ plan](docs/IMPLEMENTATION_PLAN.md) for the current acceptance gaps.
 - Compile-fail safety contracts: credentials are not serializable, unauthenticated clients cannot trade, cash instruments cannot gain expiry fields, market orders are not constructible, and downstream crates cannot invent arbitrary signed endpoint requests.
 
 The [coverage matrix](docs/API_COVERAGE.md) maps every documented operation and stream to its current request type and canonical contract fixture. Green canonical fixtures do not imply that every documented variant is complete.
+
+Existing REST requests are also compared with 44 captured cases from the pinned
+official Python SDK. See the [SDK compatibility contract](docs/SDK_COMPATIBILITY.md)
+for aligned behavior, reproducible evidence, and scope.
 
 ## Authentication
 

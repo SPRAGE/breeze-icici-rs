@@ -113,7 +113,7 @@ SetFunds and order/GTT/square-off mutations must never be automated as release p
 
 ## Security qualification work still open
 
-Version `0.0.2` is an Apache-2.0 experimental preview. Registry distribution does not close the remaining security work: enforce a dependency/vulnerability policy, review the native-TLS streaming dependency, establish an agreed security-reporting channel, run the declared MSRV, and perform an independent public API/security review before any stable or production-readiness claim.
+Version `0.0.3` is an Apache-2.0 experimental preview. Registry distribution does not close the remaining security work: enforce a dependency/vulnerability policy, review the native-TLS streaming dependency, establish an agreed security-reporting channel, run the declared MSRV, and perform an independent public API/security review before any stable or production-readiness claim.
 
 ## Release credential handling
 

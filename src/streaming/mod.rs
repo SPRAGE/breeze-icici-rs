@@ -269,6 +269,9 @@ impl CandleInterval {
 pub struct Candle {
     exchange: Exchange,
     stock_code: StockCode,
+    expiry_date: Option<String>,
+    datetime: String,
+    raw: String,
     interval: CandleInterval,
     open: Money,
     high: Money,
@@ -285,6 +288,16 @@ impl Candle {
     }
     pub fn stock_code(&self) -> &StockCode {
         &self.stock_code
+    }
+    pub fn expiry_date_raw(&self) -> Option<&str> {
+        self.expiry_date.as_deref()
+    }
+    /// Broker-local candle timestamp, retained without assuming a timezone.
+    pub fn datetime_raw(&self) -> &str {
+        &self.datetime
+    }
+    pub fn raw(&self) -> &str {
+        &self.raw
     }
     pub fn interval(&self) -> CandleInterval {
         self.interval
@@ -668,6 +681,8 @@ pub(crate) fn one_click_equity(
 pub(crate) struct CandleParts {
     pub exchange: Exchange,
     pub stock_code: StockCode,
+    pub expiry_date: Option<String>,
+    pub datetime: String,
     pub interval: CandleInterval,
     pub open: Money,
     pub high: Money,
@@ -678,10 +693,13 @@ pub(crate) struct CandleParts {
     pub strike: Option<Money>,
     pub open_interest: Option<Money>,
 }
-pub(crate) fn candle(parts: CandleParts) -> Candle {
+pub(crate) fn candle(parts: CandleParts, raw: String) -> Candle {
     Candle {
         exchange: parts.exchange,
         stock_code: parts.stock_code,
+        expiry_date: parts.expiry_date,
+        datetime: parts.datetime,
+        raw,
         interval: parts.interval,
         open: parts.open,
         high: parts.high,

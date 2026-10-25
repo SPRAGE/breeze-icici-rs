@@ -7,8 +7,8 @@ use serde_json::Value;
 
 use crate::EndpointRequest;
 use crate::domain::{
-    Count, DateRange, DerivativeExchange, Instrument, Interval, Money, OptionRight, Product,
-    StockCode, expiry_timestamp,
+    Count, DateRange, DerivativeExchange, Exchange, Instrument, Interval, Money, OptionRight,
+    Product, StockCode, expiry_timestamp,
 };
 use crate::error::{Error, ValidationError};
 use crate::request::{AuthenticationMode, EndpointBase, compact_json};
@@ -104,6 +104,19 @@ impl HistoricalV1Request {
         range: DateRange,
         instrument: Instrument,
     ) -> Result<Self, ValidationError> {
+        if interval == Interval::OneSecond {
+            return Err(ValidationError::new(
+                "one-second history requires historical v2",
+            ));
+        }
+        if !matches!(
+            instrument.exchange(),
+            Exchange::Nse | Exchange::Nfo | Exchange::Ndx | Exchange::Mcx
+        ) {
+            return Err(ValidationError::new(
+                "historical v1 supports NSE, NFO, NDX, or MCX",
+            ));
+        }
         Ok(Self {
             interval,
             range,
@@ -366,6 +379,7 @@ impl EndpointRequest for QuoteRequest {
 pub struct OptionChainRequest {
     exchange: DerivativeExchange,
     stock_code: StockCode,
+    product: Product,
     expiry: Option<NaiveDate>,
     right: Option<OptionRight>,
     strike: Option<Money>,
@@ -379,10 +393,18 @@ impl OptionChainRequest {
         OptionChainBuilder(Self {
             exchange,
             stock_code,
+            product: Product::Options,
             expiry: None,
             right: None,
             strike: None,
         })
+    }
+
+    /// Builds the documented futures form of the option-chain endpoint.
+    pub fn futures(exchange: DerivativeExchange, stock_code: StockCode) -> OptionChainBuilder {
+        let mut builder = Self::builder(exchange, stock_code);
+        builder.0.product = Product::Futures;
+        builder
     }
 }
 
@@ -390,9 +412,9 @@ impl TryFrom<&Instrument> for OptionChainRequest {
     type Error = ValidationError;
 
     fn try_from(instrument: &Instrument) -> Result<Self, Self::Error> {
-        if instrument.product() != Product::Options {
+        if !matches!(instrument.product(), Product::Options | Product::Futures) {
             return Err(ValidationError::new(
-                "option chain instrument must be an option",
+                "option chain instrument must be a future or option",
             ));
         }
         let exchange = match instrument.exchange() {
@@ -408,6 +430,11 @@ impl TryFrom<&Instrument> for OptionChainRequest {
         let expiry = instrument
             .expiry()
             .ok_or_else(|| ValidationError::new("option chain option is missing expiry"))?;
+        if instrument.product() == Product::Futures {
+            return Self::futures(exchange, instrument.stock_code().clone())
+                .expiry(expiry)
+                .build();
+        }
         let right = instrument
             .right()
             .ok_or_else(|| ValidationError::new("option chain option is missing right"))?;
@@ -457,6 +484,14 @@ impl OptionChainBuilder {
         let count = self.0.expiry.is_some() as u8
             + self.0.right.is_some() as u8
             + self.0.strike.is_some() as u8;
+        if self.0.product == Product::Futures {
+            if self.0.right.is_some() || self.0.strike.is_some() {
+                return Err(ValidationError::new(
+                    "futures chain does not accept option right or strike",
+                ));
+            }
+            return Ok(self.0);
+        }
         if count < 2 {
             Err(ValidationError::new(
                 "option chain requires at least two contract filters",
@@ -494,7 +529,7 @@ impl EndpointRequest for OptionChainRequest {
             stock_code: self.stock_code.as_str(),
             exchange_code: self.exchange.wire(),
             expiry_date: self.expiry.map(expiry_timestamp),
-            product_type: "options",
+            product_type: self.product.wire(),
             right: self.right.map(OptionRight::wire),
             strike_price: self.strike.as_ref().map(Money::to_wire_string),
         })

@@ -12,7 +12,7 @@ use chrono::Duration as ChronoDuration;
 use wiremock::matchers::{body_string, header, method, path, query_param};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};
 
-use crate::rest_wire::{cancel_order, historical_v2, place_order};
+use crate::rest_wire::{cancel_order, historical_v2, modify_order, place_order};
 use crate::support::{
     SESSION_TOKEN, client_with_endpoints, credentials, fixed_time, production_shape_test_endpoints,
     response_fixture,
@@ -84,6 +84,56 @@ async fn reqwest_transport_really_sends_a_signed_json_body_on_get() {
 
     let funds = client.execute(GetFunds).await.unwrap();
     assert_eq!(funds.unallocated_balance().to_string(), "87500");
+}
+
+#[tokio::test]
+async fn sdk_modify_facade_reads_order_state_before_its_single_mutation_attempt() {
+    for (status, allowed) in [
+        (Some("Ordered"), true),
+        (Some("Requested"), true),
+        (Some("Partially Executed"), true),
+        (Some("Executed"), false),
+        (Some("Cancelled"), false),
+        (None, false),
+    ] {
+        let server = MockServer::start().await;
+        let client = client_with_endpoints(production_shape_test_endpoints(&server.uri()));
+        let mut detail: serde_json::Value =
+            serde_json::from_slice(&response_fixture("orders.detail")).unwrap();
+        if let Some(status) = status {
+            detail["Success"][0]["status"] = serde_json::json!(status);
+        } else {
+            detail["Success"] = serde_json::json!([]);
+        }
+        Mock::given(method("GET"))
+            .and(path("/breezeapi/api/v1/order"))
+            .and(body_string(
+                r#"{"exchange_code":"NSE","order_id":"ORDER-TEST-1"}"#,
+            ))
+            .respond_with(ResponseTemplate::new(200).set_body_json(detail))
+            .expect(1)
+            .mount(&server)
+            .await;
+        Mock::given(method("PUT"))
+            .and(path("/breezeapi/api/v1/order"))
+            .respond_with(
+                ResponseTemplate::new(200).set_body_bytes(response_fixture("orders.modify")),
+            )
+            .expect(if allowed { 1 } else { 0 })
+            .mount(&server)
+            .await;
+        let result = client.trading().modify(modify_order()).await;
+        assert_eq!(result.is_ok(), allowed, "status {status:?}");
+        let requests = server.received_requests().await.unwrap();
+        assert_eq!(requests[0].method.as_str(), "GET");
+        if allowed {
+            assert_eq!(requests[1].method.as_str(), "PUT");
+        }
+        if !allowed {
+            assert!(matches!(result, Err(Error::Validation(_))));
+        }
+        server.verify().await;
+    }
 }
 
 #[tokio::test]

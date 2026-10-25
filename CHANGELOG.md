@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-10-25
+
+- Preserve candle timestamps, derivative expiries, and original CSV frames;
+  decode every commodity depth row and retain currency/BFO exchange identity.
+- Add 5/30-minute historical intervals, futures option chains, futures cover-OCO,
+  BTST placement, and explicit BTST/MTF, stop-loss, and N/S preview selectors.
+- Match the pinned official SDK for existing APIs: require a nonempty calculator
+  product, default preview selectors to empty, omit unused margin cover fields,
+  add one-second v2 history and optional read filters, and preserve SDK routing
+  metadata. Explicit N/S flags and neutral/nonzero cover fields remain available.
+- Add SDK VTC validity and explicit GTT exchange selection. The modification
+  facade reads current order status before its single mutation attempt.
+- Verify all 27 existing REST operations against 44 SDK-derived request cases,
+  with hash-checked, offline capture tooling and documented evidence boundaries.
+- Preserve JSON numeric money exactly through response envelopes, rejecting
+  values outside the supported decimal precision instead of rounding them.
+
 ## [0.0.2] - 2026-09-02
 
 - Added `SessionToken::expose_for_persistence()` for applications to copy a
@@ -31,3 +48,5 @@ All notable changes to this project will be documented in this file.
 
 [0.0.1]: https://github.com/SPRAGE/breeze-icici-rs/releases/tag/v0.0.1
 [0.0.2]: https://github.com/SPRAGE/breeze-icici-rs/compare/v0.0.1...v0.0.2
+[0.0.3]: https://github.com/SPRAGE/breeze-icici-rs/compare/v0.0.2...v0.0.3
+[Unreleased]: https://github.com/SPRAGE/breeze-icici-rs/compare/v0.0.3...HEAD

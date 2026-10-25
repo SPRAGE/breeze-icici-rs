@@ -1,0 +1,538 @@
+{
+  "sdk_revision": "4125106b48932ff99b45d593749dcec21c552558",
+  "source_sha256": {
+    "breeze_connect.py": "430f1a97338e765141108de980ba62f0410739e09569f9849dd69e47040780a8",
+    "config.py": "87d8bc428388b131bbe0f767becbf5cfe23988c922a51b03bb85f1ddb7c25f4d"
+  },
+  "cases": {
+    "auth.customer_details": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/customerdetails",
+      "path": "/breezeapi/api/v1/customerdetails",
+      "body": "{\"SessionToken\":\"api-session-test\",\"AppKey\":\"app-key-test\"}",
+      "headers": {
+        "content-type": "application/json"
+      }
+    },
+    "account.demat_holdings": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/dematholdings",
+      "path": "/breezeapi/api/v1/dematholdings",
+      "body": "{}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "account.get_funds": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/funds",
+      "path": "/breezeapi/api/v1/funds",
+      "body": "{}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "account.set_funds": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/funds",
+      "path": "/breezeapi/api/v1/funds",
+      "body": "{\"transaction_type\":\"Credit\",\"amount\":\"10000\",\"segment\":\"FNO\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "market.historical_v1": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/historicalcharts",
+      "path": "/breezeapi/api/v1/historicalcharts",
+      "body": "{\"interval\":\"minute\",\"from_date\":\"2025-02-03T09:15:00.000Z\",\"to_date\":\"2025-02-03T15:30:00.000Z\",\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product_type\":\"cash\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "risk.margin_calculator": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/margincalculator",
+      "path": "/breezeapi/api/v1/margincalculator",
+      "body": "{\"list_of_positions\":[{\"strike_price\":\"0\",\"quantity\":\"75\",\"right\":\"others\",\"product\":\"futures\",\"action\":\"buy\",\"price\":\"23400\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"stock_code\":\"NIFTY\"}],\"exchange_code\":\"NFO\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "account.get_margin": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/margin",
+      "path": "/breezeapi/api/v1/margin",
+      "body": "{\"exchange_code\":\"NSE\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.place": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"action\":\"buy\",\"order_type\":\"limit\",\"quantity\":\"1\",\"price\":\"420.00\",\"validity\":\"day\",\"settlement_id\":\"\",\"order_segment_code\":\"\",\"lots\":\"\",\"user_remark\":\"rustsdk\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.detail": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"exchange_code\":\"NSE\",\"order_id\":\"ORDER-TEST-1\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.list": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"exchange_code\":\"NSE\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.cancel": {
+      "method": "DELETE",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"exchange_code\":\"NSE\",\"order_id\":\"ORDER-TEST-1\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.modify": {
+      "method": "PUT",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"order_id\":\"ORDER-TEST-1\",\"exchange_code\":\"NSE\",\"quantity\":\"2\",\"price\":\"421.00\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      },
+      "preflight": [
+        {
+          "method": "GET",
+          "path": "/order",
+          "body": {
+            "exchange_code": "NSE",
+            "order_id": "ORDER-TEST-1"
+          }
+        }
+      ]
+    },
+    "risk.limit_price": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/fnolmtpriceandqtycal",
+      "path": "/breezeapi/api/v1/fnolmtpriceandqtycal",
+      "body": "{\"strike_price\":\"24000\",\"product_type\":\"options\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"underlying\":\"NIFTY\",\"exchange_code\":\"NFO\",\"order_flow\":\"buy\",\"stop_loss_trigger\":\"5.00\",\"option_type\":\"call\",\"source_flag\":\"P\",\"limit_rate\":\"6.00\",\"order_reference\":\"ORDER-TEST-1\",\"available_quantity\":\"75\",\"market_type\":\"limit\",\"fresh_order_limit\":\"6.00\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "portfolio.holdings": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/portfolioholdings",
+      "path": "/breezeapi/api/v1/portfolioholdings",
+      "body": "{\"exchange_code\":\"NSE\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\",\"stock_code\":\"ITC\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "portfolio.positions": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/portfoliopositions",
+      "path": "/breezeapi/api/v1/portfoliopositions",
+      "body": "{}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "market.quotes": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/quotes",
+      "path": "/breezeapi/api/v1/quotes",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product_type\":\"cash\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.square_off": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/squareoff",
+      "path": "/breezeapi/api/v1/squareoff",
+      "body": "{\"source_flag\":\"\",\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"quantity\":\"75\",\"price\":\"6.00\",\"action\":\"sell\",\"order_type\":\"limit\",\"validity\":\"day\",\"stoploss_price\":\"\",\"disclosed_quantity\":\"0\",\"protection_percentage\":\"\",\"settlement_id\":\"\",\"margin_amount\":\"\",\"open_quantity\":\"75\",\"cover_quantity\":\"\",\"product_type\":\"options\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"validity_date\":\"\",\"alias_name\":\"\",\"trade_password\":\"\",\"order_reference\":\"\",\"position_exchange_code\":\"\",\"lots\":\"\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "trades.list": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/trades",
+      "path": "/breezeapi/api/v1/trades",
+      "body": "{\"exchange_code\":\"NSE\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\",\"product_type\":\"cash\",\"action\":\"buy\",\"stock_code\":\"ITC\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "trades.detail": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/trades",
+      "path": "/breezeapi/api/v1/trades",
+      "body": "{\"exchange_code\":\"NSE\",\"order_id\":\"ORDER-TEST-1\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "market.option_chain": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/optionchain",
+      "path": "/breezeapi/api/v1/optionchain",
+      "body": "{\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"product_type\":\"options\",\"right\":\"call\",\"strike_price\":\"24000\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.preview_equity": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/preview_order",
+      "path": "/breezeapi/api/v1/preview_order",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"order_type\":\"limit\",\"price\":\"420.00\",\"action\":\"buy\",\"quantity\":\"1\",\"expiry_date\":\"\",\"right\":\"\",\"strike_price\":\"\",\"specialflag\":\"\",\"stoploss\":\"\",\"order_rate_fresh\":\"\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "orders.preview_fno": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/preview_order",
+      "path": "/breezeapi/api/v1/preview_order",
+      "body": "{\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"product\":\"options\",\"order_type\":\"limit\",\"price\":\"6.00\",\"action\":\"buy\",\"quantity\":\"75\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"specialflag\":\"\",\"stoploss\":\"5.00\",\"order_rate_fresh\":\"6.00\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "market.historical_v2": {
+      "method": "GET",
+      "url": "https://breezeapi.icicidirect.com/api/v2/historicalcharts",
+      "path": "/api/v2/historicalcharts",
+      "body": "",
+      "headers": {
+        "content-type": "application/json",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA==",
+        "apikey": "app-key-test"
+      },
+      "query": {
+        "interval": "1minute",
+        "from_date": "2025-02-03T09:15:00.000Z",
+        "to_date": "2025-02-03T15:30:00.000Z",
+        "stock_code": "NIFTY",
+        "exch_code": "NFO",
+        "product_type": "options",
+        "expiry_date": "2025-02-27",
+        "strike_price": "24000",
+        "right": "call"
+      }
+    },
+    "gtt.place": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"NFO\",\"stock_code\":\"NIFTY\",\"product\":\"options\",\"quantity\":\"75\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"gtt_type\":\"cover_oco\",\"fresh_order_action\":\"buy\",\"fresh_order_price\":\"6.00\",\"fresh_order_type\":\"limit\",\"index_or_stock\":\"index\",\"trade_date\":\"2025-02-05T00:00:00.000Z\",\"order_details\":[{\"gtt_leg_type\":\"target\",\"action\":\"sell\",\"limit_price\":\"12.00\",\"trigger_price\":\"11.50\"},{\"gtt_leg_type\":\"stoploss\",\"action\":\"sell\",\"limit_price\":\"4.00\",\"trigger_price\":\"5.00\"}]}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "gtt.list": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"NFO\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "gtt.cancel": {
+      "method": "DELETE",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"NFO\",\"gtt_order_id\":\"GTT-TEST-1\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "gtt.modify": {
+      "method": "PUT",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"NFO\",\"gtt_order_id\":\"GTT-TEST-1\",\"gtt_type\":\"cover_oco\",\"order_details\":[{\"gtt_leg_type\":\"target\",\"action\":\"sell\",\"limit_price\":\"13.00\",\"trigger_price\":\"12.50\"},{\"gtt_leg_type\":\"stoploss\",\"action\":\"sell\",\"limit_price\":\"3.50\",\"trigger_price\":\"4.50\"}]}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.history_second": {
+      "method": "GET",
+      "url": "https://breezeapi.icicidirect.com/api/v2/historicalcharts",
+      "path": "/api/v2/historicalcharts",
+      "body": "",
+      "headers": {
+        "content-type": "application/json",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA==",
+        "apikey": "app-key-test"
+      },
+      "query": {
+        "interval": "1second",
+        "from_date": "2025-02-03T09:15:00.000Z",
+        "to_date": "2025-02-03T15:30:00.000Z",
+        "stock_code": "NIFTY",
+        "exch_code": "NFO",
+        "product_type": "options",
+        "expiry_date": "2025-02-27",
+        "strike_price": "24000",
+        "right": "call"
+      }
+    },
+    "sdk.trades_all": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/trades",
+      "path": "/breezeapi/api/v1/trades",
+      "body": "{\"exchange_code\":\"NSE\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.futures_all": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/optionchain",
+      "path": "/breezeapi/api/v1/optionchain",
+      "body": "{\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"product_type\":\"futures\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.gtt_list_bfo": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"BFO\",\"from_date\":\"2025-02-01T00:00:00.000Z\",\"to_date\":\"2025-02-05T23:59:59.000Z\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.gtt_cancel_bfo": {
+      "method": "DELETE",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"BFO\",\"gtt_order_id\":\"GTT-TEST-1\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.gtt_modify_bfo": {
+      "method": "PUT",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"BFO\",\"gtt_order_id\":\"GTT-TEST-1\",\"gtt_type\":\"cover_oco\",\"order_details\":[{\"gtt_leg_type\":\"target\",\"action\":\"sell\",\"limit_price\":\"13.00\",\"trigger_price\":\"12.50\"},{\"gtt_leg_type\":\"stoploss\",\"action\":\"sell\",\"limit_price\":\"3.50\",\"trigger_price\":\"4.50\"}]}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.limit_blank_product": {
+      "rejected": true,
+      "error": "Product-type cannot be empty for Exchange-Code 'nfo' or 'bfo'"
+    },
+    "sdk.limit_source_m": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/fnolmtpriceandqtycal",
+      "path": "/breezeapi/api/v1/fnolmtpriceandqtycal",
+      "body": "{\"strike_price\":\"24000\",\"product_type\":\"options\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"underlying\":\"NIFTY\",\"exchange_code\":\"NFO\",\"order_flow\":\"buy\",\"stop_loss_trigger\":\"5.00\",\"option_type\":\"call\",\"source_flag\":\"M\",\"limit_rate\":\"6.00\",\"order_reference\":\"ORDER-TEST-1\",\"available_quantity\":\"75\",\"market_type\":\"limit\",\"fresh_order_limit\":\"6.00\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.preview_stoploss_blank": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/preview_order",
+      "path": "/breezeapi/api/v1/preview_order",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"order_type\":\"stoploss\",\"price\":\"420.00\",\"action\":\"buy\",\"quantity\":\"1\",\"expiry_date\":\"\",\"right\":\"\",\"strike_price\":\"\",\"specialflag\":\"\",\"stoploss\":\"\",\"order_rate_fresh\":\"\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.place_vtc": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"action\":\"buy\",\"order_type\":\"limit\",\"quantity\":\"1\",\"price\":\"420.00\",\"validity\":\"vtc\",\"settlement_id\":\"\",\"order_segment_code\":\"\",\"lots\":\"\",\"user_remark\":\"rustsdk\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.place_routing": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"action\":\"buy\",\"order_type\":\"limit\",\"quantity\":\"1\",\"price\":\"420.00\",\"validity\":\"day\",\"settlement_id\":\"SETTLEMENT-TEST\",\"order_segment_code\":\"NSE\",\"lots\":\"2\",\"user_remark\":\"rustsdk\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.history_five": {
+      "method": "GET",
+      "url": "https://breezeapi.icicidirect.com/api/v2/historicalcharts",
+      "path": "/api/v2/historicalcharts",
+      "body": "",
+      "headers": {
+        "content-type": "application/json",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA==",
+        "apikey": "app-key-test"
+      },
+      "query": {
+        "interval": "5minute",
+        "from_date": "2025-02-03T09:15:00.000Z",
+        "to_date": "2025-02-03T15:30:00.000Z",
+        "stock_code": "NIFTY",
+        "exch_code": "NFO",
+        "product_type": "options",
+        "expiry_date": "2025-02-27",
+        "strike_price": "24000",
+        "right": "call"
+      }
+    },
+    "sdk.history_thirty": {
+      "method": "GET",
+      "url": "https://breezeapi.icicidirect.com/api/v2/historicalcharts",
+      "path": "/api/v2/historicalcharts",
+      "body": "",
+      "headers": {
+        "content-type": "application/json",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA==",
+        "apikey": "app-key-test"
+      },
+      "query": {
+        "interval": "30minute",
+        "from_date": "2025-02-03T09:15:00.000Z",
+        "to_date": "2025-02-03T15:30:00.000Z",
+        "stock_code": "NIFTY",
+        "exch_code": "NFO",
+        "product_type": "options",
+        "expiry_date": "2025-02-27",
+        "strike_price": "24000",
+        "right": "call"
+      }
+    },
+    "sdk.margin_cover": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/margincalculator",
+      "path": "/breezeapi/api/v1/margincalculator",
+      "body": "{\"list_of_positions\":[{\"strike_price\":\"24000\",\"quantity\":\"75\",\"right\":\"call\",\"product\":\"options\",\"action\":\"buy\",\"price\":\"245.05\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"stock_code\":\"NIFTY\",\"cover_order_flow\":\"sell\",\"fresh_order_type\":\"limit\",\"cover_limit_rate\":\"180.00\",\"cover_sltp_price\":\"200.00\",\"fresh_limit_rate\":\"245.05\",\"open_quantity\":\"75\"}],\"exchange_code\":\"NFO\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.gtt_futures": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/gttorder",
+      "path": "/breezeapi/api/v1/gttorder",
+      "body": "{\"exchange_code\":\"NFO\",\"stock_code\":\"NIFTY\",\"product\":\"futures\",\"quantity\":\"75\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"others\",\"strike_price\":\"0\",\"gtt_type\":\"cover_oco\",\"fresh_order_action\":\"buy\",\"fresh_order_price\":\"23400\",\"fresh_order_type\":\"limit\",\"index_or_stock\":\"index\",\"trade_date\":\"2025-02-05T00:00:00.000Z\",\"order_details\":[{\"gtt_leg_type\":\"target\",\"action\":\"sell\",\"limit_price\":\"25000\",\"trigger_price\":\"24900\"},{\"gtt_leg_type\":\"stoploss\",\"action\":\"sell\",\"limit_price\":\"22000\",\"trigger_price\":\"22100\"}]}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.btst_placement": {
+      "method": "POST",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/order",
+      "path": "/breezeapi/api/v1/order",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"btst\",\"action\":\"buy\",\"order_type\":\"limit\",\"quantity\":\"1\",\"price\":\"420.00\",\"validity\":\"day\",\"settlement_id\":\"\",\"order_segment_code\":\"\",\"lots\":\"\",\"user_remark\":\"rustsdk\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    },
+    "sdk.mtf_preview": {
+      "method": "GET",
+      "url": "https://api.icicidirect.com/breezeapi/api/v1/preview_order",
+      "path": "/breezeapi/api/v1/preview_order",
+      "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"mtf\",\"order_type\":\"limit\",\"price\":\"420.00\",\"action\":\"buy\",\"quantity\":\"1\",\"expiry_date\":\"\",\"right\":\"\",\"strike_price\":\"\",\"specialflag\":\"\",\"stoploss\":\"\",\"order_rate_fresh\":\"\"}",
+      "headers": {
+        "content-type": "application/json",
+        "x-appkey": "app-key-test",
+        "x-sessiontoken": "dXNlci10ZXN0OnNlc3Npb24tdGVzdA=="
+      }
+    }
+  }
+}

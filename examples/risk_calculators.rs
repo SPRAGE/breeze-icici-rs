@@ -1,10 +1,13 @@
 mod support;
 
+use std::str::FromStr;
+
+use breeze_icici::domain::{Count, Money};
 use breeze_icici::orders::OrderId;
 use breeze_icici::risk::{LimitPriceRequest, MarginCalculationRequest, MarginPosition, SourceFlag};
 use support::{
     AnyError, action_from_env, authenticated_client, input_error, instrument_from_env,
-    money_from_env, operation_arg, quantity_from_env, required_env,
+    money_from_env, operation_arg, optional_env, quantity_from_env, required_env,
 };
 
 enum Operation {
@@ -31,18 +34,26 @@ async fn main() -> Result<(), AnyError> {
             {
                 "P" | "PORTFOLIO" => SourceFlag::Portfolio,
                 "O" | "OTHER" => SourceFlag::Other,
-                _ => return Err(input_error("BREEZE_SOURCE_FLAG must be P or O").into()),
+                "M" => SourceFlag::M,
+                _ => return Err(input_error("BREEZE_SOURCE_FLAG must be P, M, or O").into()),
             };
-            Operation::LimitPrice(
-                LimitPriceRequest::builder(instrument, action)
-                    .stop_loss_trigger(money_from_env("BREEZE_STOP_LOSS_TRIGGER")?)
-                    .source_flag(source_flag)
-                    .limit_rate(money_from_env("BREEZE_LIMIT_RATE")?)
-                    .order_reference(OrderId::new(required_env("BREEZE_ORDER_ID")?)?)
-                    .available_quantity(quantity_from_env("BREEZE_AVAILABLE_QUANTITY")?)
-                    .fresh_order_limit(money_from_env("BREEZE_FRESH_ORDER_LIMIT")?)
-                    .build()?,
-            )
+            let mut builder = LimitPriceRequest::builder(instrument, action)
+                .stop_loss_trigger(money_from_env("BREEZE_STOP_LOSS_TRIGGER")?)
+                .source_flag(source_flag)
+                .fresh_order_limit(money_from_env("BREEZE_FRESH_ORDER_LIMIT")?);
+            if let Some(value) = optional_env("BREEZE_LIMIT_RATE") {
+                builder = builder.limit_rate(Money::from_str(&value)?);
+            }
+            if let Some(value) = optional_env("BREEZE_ORDER_ID") {
+                builder = builder.order_reference(OrderId::new(value)?);
+            }
+            if let Some(value) = optional_env("BREEZE_AVAILABLE_QUANTITY") {
+                let value = value.parse::<u64>().map_err(|_| {
+                    input_error("BREEZE_AVAILABLE_QUANTITY must be a non-negative integer")
+                })?;
+                builder = builder.available_quantity(Count::new(value));
+            }
+            Operation::LimitPrice(builder.build()?)
         }
         _ => return Err(input_error("operation must be margin or limit-price").into()),
     };

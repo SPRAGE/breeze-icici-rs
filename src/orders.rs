@@ -7,7 +7,8 @@ use serde_json::Value;
 
 use crate::EndpointRequest;
 use crate::domain::{
-    DateRange, Exchange, Instrument, Money, Quantity, UnknownValue, UserRemark, expiry_timestamp,
+    DateRange, Exchange, Instrument, Money, Product, Quantity, UnknownValue, UserRemark,
+    expiry_timestamp,
 };
 use crate::error::{Error, ValidationError};
 use crate::rate_limit::RequestClass;
@@ -47,6 +48,15 @@ macro_rules! id_type {
 }
 
 id_type!(OrderId, "order ID");
+id_type!(SettlementId, "settlement ID");
+id_type!(OrderSegmentCode, "order segment code");
+
+#[derive(Clone, Debug, Default)]
+struct OrderRouting {
+    settlement_id: Option<SettlementId>,
+    segment: Option<OrderSegmentCode>,
+    lots: Option<Quantity>,
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Action {
@@ -68,7 +78,7 @@ pub enum OrderType {
     StopLoss,
 }
 impl OrderType {
-    fn wire(self) -> &'static str {
+    pub(crate) fn wire(self) -> &'static str {
         match self {
             Self::Limit => "limit",
             Self::StopLoss => "stoploss",
@@ -104,23 +114,47 @@ fn validate_stop_loss_relation(
     }
 }
 
+fn validate_product(
+    instrument: &Instrument,
+    product: Product,
+    preview: bool,
+) -> Result<(), ValidationError> {
+    let valid = match instrument.product() {
+        Product::Cash => {
+            matches!(product, Product::Cash | Product::Btst) || (preview && product == Product::Mtf)
+        }
+        expected => product == expected,
+    };
+    if valid {
+        Ok(())
+    } else {
+        Err(ValidationError::new(
+            "product is not supported for this instrument and operation",
+        ))
+    }
+}
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Validity {
     Day,
     ImmediateOrCancel,
+    ValidTillCancelled,
 }
 impl Validity {
     fn wire(self) -> &'static str {
         match self {
             Self::Day => "day",
             Self::ImmediateOrCancel => "ioc",
+            Self::ValidTillCancelled => "vtc",
         }
     }
 }
 
 #[derive(Clone, Debug)]
 pub struct PlaceOrderRequest {
+    routing: OrderRouting,
     instrument: Instrument,
+    product: Product,
     action: Action,
     order_type: OrderType,
     quantity: Quantity,
@@ -133,7 +167,9 @@ pub struct PlaceOrderRequest {
 
 #[derive(Clone, Debug)]
 pub struct PlaceOrderBuilder {
+    routing: OrderRouting,
     instrument: Instrument,
+    product: Product,
     action: Action,
     quantity: Quantity,
     price: Money,
@@ -152,6 +188,8 @@ impl PlaceOrderRequest {
         price: Money,
     ) -> PlaceOrderBuilder {
         PlaceOrderBuilder {
+            routing: OrderRouting::default(),
+            product: instrument.product(),
             instrument,
             action,
             quantity,
@@ -174,6 +212,8 @@ impl PlaceOrderRequest {
         trigger: Money,
     ) -> PlaceOrderBuilder {
         PlaceOrderBuilder {
+            routing: OrderRouting::default(),
+            product: instrument.product(),
             instrument,
             action,
             quantity,
@@ -188,6 +228,9 @@ impl PlaceOrderRequest {
     pub fn instrument(&self) -> &Instrument {
         &self.instrument
     }
+    pub fn product(&self) -> Product {
+        self.product
+    }
     pub fn action(&self) -> Action {
         self.action
     }
@@ -199,6 +242,23 @@ impl PlaceOrderRequest {
     }
 }
 impl PlaceOrderBuilder {
+    pub fn settlement_id(mut self, value: SettlementId) -> Self {
+        self.routing.settlement_id = Some(value);
+        self
+    }
+    pub fn order_segment_code(mut self, value: OrderSegmentCode) -> Self {
+        self.routing.segment = Some(value);
+        self
+    }
+    pub fn lots(mut self, value: Quantity) -> Self {
+        self.routing.lots = Some(value);
+        self
+    }
+    /// Selects cash or BTST for an equity instrument; MTF placement is not exposed.
+    pub fn product(mut self, value: Product) -> Self {
+        self.product = value;
+        self
+    }
     pub fn validity(mut self, value: Validity) -> Self {
         self.validity = Some(value);
         self
@@ -212,6 +272,7 @@ impl PlaceOrderBuilder {
         self
     }
     pub fn build(self) -> Result<PlaceOrderRequest, ValidationError> {
+        validate_product(&self.instrument, self.product, false)?;
         if let Some(trigger) = &self.stop_loss {
             validate_stop_loss_relation(self.action, &self.price, trigger)?;
         }
@@ -224,7 +285,9 @@ impl PlaceOrderBuilder {
             ));
         }
         Ok(PlaceOrderRequest {
+            routing: self.routing,
             instrument: self.instrument,
+            product: self.product,
             action: self.action,
             order_type: self.order_type,
             quantity: self.quantity,
@@ -281,7 +344,7 @@ impl EndpointRequest for PlaceOrderRequest {
     }
     fn body(&self) -> Result<Vec<u8>, Error> {
         #[derive(Serialize)]
-        struct EquityBody<'a> {
+        struct Body<'a> {
             stock_code: &'a str,
             exchange_code: &'a str,
             product: &'a str,
@@ -290,72 +353,59 @@ impl EndpointRequest for PlaceOrderRequest {
             quantity: String,
             price: String,
             validity: &'a str,
+            settlement_id: &'a str,
+            order_segment_code: &'a str,
+            lots: String,
+            user_remark: &'a str,
             #[serde(skip_serializing_if = "Option::is_none")]
             stoploss: Option<String>,
             #[serde(skip_serializing_if = "Option::is_none")]
             disclosed_quantity: Option<String>,
             #[serde(skip_serializing_if = "Option::is_none")]
-            user_remark: Option<&'a str>,
+            expiry_date: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            right: Option<&'a str>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            strike_price: Option<String>,
         }
-        #[derive(Serialize)]
-        struct DerivativeBody<'a> {
-            stock_code: &'a str,
-            exchange_code: &'a str,
-            product: &'a str,
-            action: &'a str,
-            order_type: &'a str,
-            quantity: String,
-            price: String,
-            validity: &'a str,
-            #[serde(skip_serializing_if = "Option::is_none")]
-            stoploss: Option<String>,
-            #[serde(skip_serializing_if = "Option::is_none")]
-            disclosed_quantity: Option<String>,
-            expiry_date: String,
-            right: &'a str,
-            strike_price: String,
-            #[serde(skip_serializing_if = "Option::is_none")]
-            user_remark: Option<&'a str>,
-        }
-        let common_remark = self.user_remark.as_ref().map(UserRemark::as_str);
-        if let Some(expiry) = self.instrument.expiry() {
-            compact_json(&DerivativeBody {
-                stock_code: self.instrument.stock_code().as_str(),
-                exchange_code: self.instrument.exchange_wire(),
-                product: self.instrument.product().wire(),
-                action: self.action.wire(),
-                order_type: self.order_type.wire(),
-                quantity: self.quantity.get().to_string(),
-                price: self.price.to_wire_string(),
-                validity: self.validity.wire(),
-                stoploss: self.stop_loss.as_ref().map(Money::to_wire_string),
-                disclosed_quantity: self.disclosed_quantity.map(|value| value.get().to_string()),
-                expiry_date: expiry_timestamp(expiry),
-                right: self
-                    .instrument
+        compact_json(&Body {
+            stock_code: self.instrument.stock_code().as_str(),
+            exchange_code: self.instrument.exchange_wire(),
+            product: self.product.wire(),
+            action: self.action.wire(),
+            order_type: self.order_type.wire(),
+            quantity: self.quantity.get().to_string(),
+            price: self.price.to_wire_string(),
+            validity: self.validity.wire(),
+            settlement_id: self
+                .routing
+                .settlement_id
+                .as_ref()
+                .map_or("", SettlementId::as_str),
+            order_segment_code: self
+                .routing
+                .segment
+                .as_ref()
+                .map_or("", OrderSegmentCode::as_str),
+            lots: self
+                .routing
+                .lots
+                .map_or_else(String::new, |value| value.get().to_string()),
+            user_remark: self.user_remark.as_ref().map_or("", UserRemark::as_str),
+            stoploss: self.stop_loss.as_ref().map(Money::to_wire_string),
+            disclosed_quantity: self.disclosed_quantity.map(|value| value.get().to_string()),
+            expiry_date: self.instrument.expiry().map(expiry_timestamp),
+            right: self.instrument.expiry().map(|_| {
+                self.instrument
                     .right()
-                    .map_or("others", |right| right.wire()),
-                strike_price: self
-                    .instrument
+                    .map_or("others", |right| right.wire())
+            }),
+            strike_price: self.instrument.expiry().map(|_| {
+                self.instrument
                     .strike()
-                    .map_or_else(|| "0".into(), Money::to_wire_string),
-                user_remark: common_remark,
-            })
-        } else {
-            compact_json(&EquityBody {
-                stock_code: self.instrument.stock_code().as_str(),
-                exchange_code: self.instrument.exchange_wire(),
-                product: self.instrument.product().wire(),
-                action: self.action.wire(),
-                order_type: self.order_type.wire(),
-                quantity: self.quantity.get().to_string(),
-                price: self.price.to_wire_string(),
-                validity: self.validity.wire(),
-                stoploss: self.stop_loss.as_ref().map(Money::to_wire_string),
-                disclosed_quantity: self.disclosed_quantity.map(|value| value.get().to_string()),
-                user_remark: common_remark,
-            })
-        }
+                    .map_or_else(|| "0".into(), Money::to_wire_string)
+            }),
+        })
     }
 }
 
@@ -570,6 +620,9 @@ pub struct ModifyOrderBuilder {
     disclosed_quantity: Option<Quantity>,
 }
 impl ModifyOrderRequest {
+    pub(crate) fn detail_request(&self) -> OrderDetailRequest {
+        OrderDetailRequest::new(self.exchange, self.order_id.clone())
+    }
     pub fn builder(exchange: Exchange, order_id: OrderId) -> ModifyOrderBuilder {
         ModifyOrderBuilder {
             exchange,
@@ -829,8 +882,12 @@ impl EndpointRequest for SquareOffRequest {
             expiry_date: String,
             right: &'a str,
             strike_price: String,
+            validity_date: &'a str,
             alias_name: &'a str,
             trade_password: &'a str,
+            order_reference: &'a str,
+            position_exchange_code: &'a str,
+            lots: &'a str,
         }
         compact_json(&Body {
             source_flag: "",
@@ -866,13 +923,35 @@ impl EndpointRequest for SquareOffRequest {
                 .map_or_else(String::new, Money::to_wire_string),
             alias_name: "",
             trade_password: "",
+            validity_date: "",
+            order_reference: "",
+            position_exchange_code: "",
+            lots: "",
         })
+    }
+}
+
+/// The documented `specialflag` selectors on the read-only preview endpoint.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PreviewFlag {
+    Normal,
+    Special,
+}
+impl PreviewFlag {
+    fn wire(self) -> &'static str {
+        match self {
+            Self::Normal => "N",
+            Self::Special => "S",
+        }
     }
 }
 
 #[derive(Clone, Debug)]
 pub struct PreviewOrderRequest {
     instrument: Instrument,
+    product: Product,
+    order_type: OrderType,
+    special_flag: Option<PreviewFlag>,
     action: Action,
     quantity: Quantity,
     price: Money,
@@ -892,6 +971,9 @@ impl PreviewOrderRequest {
     ) -> PreviewOrderBuilder {
         PreviewOrderBuilder {
             request: PreviewOrderRequest {
+                product: instrument.product(),
+                order_type: OrderType::Limit,
+                special_flag: None,
                 instrument,
                 action,
                 quantity,
@@ -903,6 +985,19 @@ impl PreviewOrderRequest {
     }
 }
 impl PreviewOrderBuilder {
+    /// Selects the documented cash, BTST, or MTF preview for equity instruments.
+    pub fn product(mut self, value: Product) -> Self {
+        self.request.product = value;
+        self
+    }
+    pub fn order_type(mut self, value: OrderType) -> Self {
+        self.request.order_type = value;
+        self
+    }
+    pub fn special_flag(mut self, value: PreviewFlag) -> Self {
+        self.request.special_flag = Some(value);
+        self
+    }
     pub fn stop_loss(mut self, value: Money) -> Self {
         self.request.stop_loss = Some(value);
         self
@@ -912,6 +1007,7 @@ impl PreviewOrderBuilder {
         self
     }
     pub fn build(self) -> Result<PreviewOrderRequest, ValidationError> {
+        validate_product(&self.request.instrument, self.request.product, true)?;
         Ok(self.request)
     }
 }
@@ -959,8 +1055,8 @@ impl EndpointRequest for PreviewOrderRequest {
         compact_json(&Body {
             stock_code: self.instrument.stock_code().as_str(),
             exchange_code: self.instrument.exchange_wire(),
-            product: self.instrument.product().wire(),
-            order_type: OrderType::Limit.wire(),
+            product: self.product.wire(),
+            order_type: self.order_type.wire(),
             price: self.price.to_wire_string(),
             action: self.action.wire(),
             quantity: self.quantity.get().to_string(),
@@ -974,7 +1070,7 @@ impl EndpointRequest for PreviewOrderRequest {
                 .instrument
                 .strike()
                 .map_or_else(String::new, Money::to_wire_string),
-            specialflag: "",
+            specialflag: self.special_flag.map_or("", PreviewFlag::wire),
             stoploss: self
                 .stop_loss
                 .as_ref()

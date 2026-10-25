@@ -167,8 +167,14 @@ pub fn interval_from_env() -> Result<Interval, AnyError> {
         .as_str()
     {
         "minute" | "1minute" => Ok(Interval::OneMinute),
+        "1second" => Ok(Interval::OneSecond),
+        "5minute" => Ok(Interval::FiveMinutes),
+        "30minute" => Ok(Interval::ThirtyMinutes),
         "day" | "1day" => Ok(Interval::OneDay),
-        _ => Err(input_error("BREEZE_INTERVAL must be minute, 1minute, day, or 1day").into()),
+        _ => Err(input_error(
+            "BREEZE_INTERVAL must be 1second (v2 only), minute, 1minute, 5minute, 30minute, day, or 1day",
+        )
+        .into()),
     }
 }
 

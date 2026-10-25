@@ -458,6 +458,11 @@ impl BreezeClient<Authenticated> {
         ))
     }
 
+    /// Dispatches a typed signed request directly, without service workflow checks.
+    ///
+    /// Prefer [`TradingService::modify`] for SDK-compatible modification: that
+    /// facade reads order status before writing. Direct `execute` deliberately
+    /// skips that preflight. Both paths attempt the mutation at most once.
     pub async fn execute<R: EndpointRequest>(&self, request: R) -> Result<R::Response, Error> {
         let execution_started = Instant::now();
         let mut attempt = 0usize;
@@ -733,6 +738,10 @@ pub(crate) fn prepare_request<R: EndpointRequest, State>(
             body = signed.body().to_vec();
         }
         AuthenticationMode::SessionV2 => {
+            headers.insert(
+                http::header::CONTENT_TYPE,
+                HeaderValue::from_static("application/json"),
+            );
             let token =
                 client
                     .inner

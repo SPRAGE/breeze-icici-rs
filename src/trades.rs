@@ -16,7 +16,7 @@ impl crate::request::sealed::Sealed for TradeDetailRequest {}
 #[derive(Clone, Debug)]
 pub struct TradeListRequest {
     exchange: Exchange,
-    range: DateRange,
+    range: Option<DateRange>,
     product: Option<Product>,
     action: Option<Action>,
     stock_code: Option<StockCode>,
@@ -25,9 +25,14 @@ pub struct TradeListRequest {
 pub struct TradeListBuilder(TradeListRequest);
 impl TradeListRequest {
     pub fn builder(exchange: Exchange, range: DateRange) -> TradeListBuilder {
+        Self::all(exchange).date_range(range)
+    }
+
+    /// Reads the SDK's unbounded trade-list form, omitting both date filters.
+    pub fn all(exchange: Exchange) -> TradeListBuilder {
         TradeListBuilder(Self {
             exchange,
-            range,
+            range: None,
             product: None,
             action: None,
             stock_code: None,
@@ -35,6 +40,10 @@ impl TradeListRequest {
     }
 }
 impl TradeListBuilder {
+    pub fn date_range(mut self, value: DateRange) -> Self {
+        self.0.range = Some(value);
+        self
+    }
     pub fn product(mut self, value: Product) -> Self {
         self.0.product = Some(value);
         self
@@ -89,8 +98,10 @@ impl EndpointRequest for TradeListRequest {
     fn body(&self) -> Result<Vec<u8>, Error> {
         #[derive(Serialize)]
         struct Body<'a> {
-            from_date: String,
-            to_date: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            from_date: Option<String>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            to_date: Option<String>,
             exchange_code: &'a str,
             #[serde(skip_serializing_if = "Option::is_none")]
             product_type: Option<&'a str>,
@@ -100,8 +111,8 @@ impl EndpointRequest for TradeListRequest {
             stock_code: Option<&'a str>,
         }
         compact_json(&Body {
-            from_date: self.range.start_wire(),
-            to_date: self.range.end_wire(),
+            from_date: self.range.as_ref().map(DateRange::start_wire),
+            to_date: self.range.as_ref().map(DateRange::end_wire),
             exchange_code: self.exchange.wire(),
             product_type: self.product.map(Product::wire),
             action: self.action.map(Action::wire),

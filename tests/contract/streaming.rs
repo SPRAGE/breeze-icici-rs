@@ -72,6 +72,95 @@ fn commodity_layout_and_depth_are_not_misclassified_as_nse_quotes() {
 }
 
 #[test]
+fn api_review_commodity_retains_every_documented_depth_row() {
+    let mut frame = raw("commodity");
+    frame.as_array_mut().unwrap().extend([
+        serde_json::json!([20, 350.3, 4, 0, 22, 350.7, 5, 0]),
+        serde_json::json!([30, 350.2, 6, 0, 32, 350.8, 7, 0]),
+    ]);
+    let StreamEvent::Commodity(tick) = decode_tick(&frame).unwrap() else {
+        panic!("expected commodity event")
+    };
+    assert_eq!(tick.depth().len(), 3);
+    assert_eq!(tick.depth()[2].buy_quantity().get(), 30);
+    assert_eq!(tick.depth()[2].sell_price().to_string(), "350.8");
+    frame
+        .as_array_mut()
+        .unwrap()
+        .push(serde_json::json!([1, 2, 3]));
+    assert!(
+        decode_tick(&frame).is_err(),
+        "malformed later levels must not be ignored"
+    );
+}
+
+#[test]
+fn api_review_currency_quotes_and_depth_keep_their_exchange() {
+    let mut quote = raw("quote_nfo");
+    quote[0] = serde_json::json!("13.1!5023");
+    let StreamEvent::Quote(tick) = decode_tick(&quote).unwrap() else {
+        panic!("expected currency quote")
+    };
+    assert_eq!(tick.exchange(), Exchange::Ndx);
+    assert_eq!(tick.open_interest().unwrap().to_string(), "2435175");
+
+    let mut frame = raw("market_depth_nse");
+    frame[0] = serde_json::json!("13.2!5023");
+    let StreamEvent::MarketDepth(depth) = decode_tick(&frame).unwrap() else {
+        panic!("expected currency depth")
+    };
+    assert_eq!(depth.exchange(), Exchange::Ndx);
+    assert_eq!(depth.levels()[0].sell_orders(), Some(3));
+}
+
+#[test]
+fn api_review_bfo_quote_and_six_field_depth_keep_their_exchange() {
+    let mut quote = raw("quote_nfo");
+    quote[0] = json!("8.1!5023");
+    let StreamEvent::Quote(tick) = decode_tick(&quote).unwrap() else {
+        panic!("expected BFO quote")
+    };
+    assert_eq!(tick.exchange(), Exchange::Bfo);
+    let frame = json!(["8.2!5023", 1739246902_u64, [[420.0, 10, 2, 420.5, 12, 3]]]);
+    let StreamEvent::MarketDepth(depth) = decode_tick(&frame).unwrap() else {
+        panic!("expected BFO depth")
+    };
+    assert_eq!(depth.exchange(), Exchange::Bfo);
+    assert_eq!(depth.levels()[0].sell_price().to_string(), "420.5");
+    assert_eq!(depth.levels()[0].sell_orders(), Some(3));
+}
+
+#[test]
+fn api_review_candles_retain_time_expiry_and_original_frame() {
+    for (fixture, expiry, datetime) in [
+        ("candle_equity", None, "2022-12-02 14:13:53"),
+        ("candle_option", Some("08-Dec-2022"), "2022-12-02 14:10:14"),
+        ("candle_future", Some("29-Dec-2022"), "2022-12-02 14:19:21"),
+    ] {
+        let frame = raw(fixture);
+        let wire = frame.as_str().unwrap();
+        let StreamEvent::Candle(candle) = decode_candle(wire).unwrap() else {
+            panic!("expected candle")
+        };
+        assert_eq!(candle.expiry_date_raw(), expiry);
+        assert_eq!(candle.datetime_raw(), datetime);
+        assert_eq!(candle.raw(), wire);
+    }
+    let first = "NFO,NIFTY,08-Dec-2022,18700.0,CE,118.5,122.5,120.5,121.0,2500,7592550,2022-12-02 14:10:14,1SEC";
+    let second = first
+        .replace("08-Dec-2022", "15-Dec-2022")
+        .replace("14:10:14", "14:11:14");
+    let StreamEvent::Candle(a) = decode_candle(first).unwrap() else {
+        panic!()
+    };
+    let StreamEvent::Candle(b) = decode_candle(&second).unwrap() else {
+        panic!()
+    };
+    assert_ne!(a.expiry_date_raw(), b.expiry_date_raw());
+    assert_ne!(a.datetime_raw(), b.datetime_raw());
+}
+
+#[test]
 fn cash_and_derivative_order_notifications_use_their_message_type_layouts() {
     let cash = decode_order_notification(&raw("order_cash")).unwrap();
     assert_eq!(cash.stock_code().as_str(), "ITC");

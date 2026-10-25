@@ -17,6 +17,8 @@ mod rate_limit;
 mod responses;
 #[path = "contract/rest_wire.rs"]
 mod rest_wire;
+#[path = "contract/sdk_compat.rs"]
+mod sdk_compat;
 #[path = "contract/streaming.rs"]
 mod streaming;
 #[path = "contract/support.rs"]

@@ -10,7 +10,7 @@ use crate::account::{
 };
 use crate::client::{Authenticated, BreezeClient};
 use crate::domain::Exchange;
-use crate::error::Error;
+use crate::error::{Error, ValidationError};
 use crate::gtt::{
     CancelGttOrderRequest, CancelGttReceipt, GttOrder, GttOrderListRequest, GttOrderRequest,
     GttReceipt, ModifyGttOrderRequest,
@@ -21,7 +21,8 @@ use crate::market::{
 };
 use crate::orders::{
     CancelOrderRequest, ModifyOrderRequest, Order, OrderDetailRequest, OrderListRequest,
-    OrderPreview, OrderReceipt, PlaceOrderRequest, PreviewOrderRequest, SquareOffRequest,
+    OrderPreview, OrderReceipt, OrderStatus, PlaceOrderRequest, PreviewOrderRequest,
+    SquareOffRequest,
 };
 use crate::portfolio::{GetPositions, Holding, HoldingsRequest, Position};
 use crate::risk::{
@@ -201,6 +202,20 @@ impl TradingService {
 
     /// Modifies the explicitly selected fields of one order.
     pub async fn modify(&self, request: ModifyOrderRequest) -> Result<OrderReceipt, Error> {
+        let orders = self.client.execute(request.detail_request()).await?;
+        let Some(order) = orders.first() else {
+            return Err(ValidationError::new("order not found").into());
+        };
+        let modifiable = matches!(
+            order.status(),
+            OrderStatus::Ordered | OrderStatus::Requested
+        ) || matches!(order.status(), OrderStatus::Other(value) if value.as_str().eq_ignore_ascii_case("partially executed"));
+        if !modifiable {
+            return Err(ValidationError::new(
+                "order has already been executed or cannot be modified",
+            )
+            .into());
+        }
         self.client.execute(request).await
     }
 

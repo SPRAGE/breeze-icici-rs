@@ -32,7 +32,7 @@ pub fn decode_tick(value: &Value) -> Result<StreamEvent, StreamDecodeError> {
 }
 
 fn decode_quote(symbol: ScriptCode, values: &[Value]) -> Result<StreamEvent, StreamDecodeError> {
-    let exchange = if values.len() == 23 {
+    let exchange = if symbol.exchange_qualifier() == 4 && values.len() == 23 {
         Exchange::Nfo
     } else {
         exchange_from_qualifier(symbol.exchange_qualifier())?
@@ -62,13 +62,13 @@ fn decode_depth(symbol: ScriptCode, values: &[Value]) -> Result<StreamEvent, Str
     if rows.len() > 100 {
         return Err(StreamDecodeError::new("too many market-depth rows"));
     }
-    let bse = symbol.exchange_qualifier() == 1;
+    let exchange = exchange_from_qualifier(symbol.exchange_qualifier())?;
     let mut levels = Vec::with_capacity(rows.len());
     for row in rows {
         let row = row
             .as_array()
             .ok_or_else(|| StreamDecodeError::new("depth row must be an array"))?;
-        let level = if bse {
+        let level = if exchange == Exchange::Bse {
             if row.len() != 4 {
                 return Err(StreamDecodeError::new(
                     "BSE depth row must contain four fields",
@@ -81,6 +81,20 @@ fn decode_depth(symbol: ScriptCode, values: &[Value]) -> Result<StreamEvent, Str
                 money(&row[2])?,
                 count(&row[3])?,
                 None,
+            )
+        } else if exchange == Exchange::Bfo {
+            if row.len() != 6 {
+                return Err(StreamDecodeError::new(
+                    "BFO depth row must contain six fields",
+                ));
+            }
+            depth_level(
+                money(&row[0])?,
+                count(&row[1])?,
+                Some(integer(&row[2])?),
+                money(&row[3])?,
+                count(&row[4])?,
+                Some(integer(&row[5])?),
             )
         } else {
             if row.len() < 7 {
@@ -97,28 +111,25 @@ fn decode_depth(symbol: ScriptCode, values: &[Value]) -> Result<StreamEvent, Str
         };
         levels.push(level);
     }
-    Ok(StreamEvent::MarketDepth(depth(
-        symbol,
-        if bse { Exchange::Bse } else { Exchange::Nse },
-        levels,
-    )))
+    Ok(StreamEvent::MarketDepth(depth(symbol, exchange, levels)))
 }
 
 fn decode_commodity(
     symbol: ScriptCode,
     values: &[Value],
 ) -> Result<StreamEvent, StreamDecodeError> {
-    if values.len() < 23 {
+    if values.len() < 22 {
         return Err(StreamDecodeError::new("commodity frame is incomplete"));
     }
-    let raw_depth = values[22]
-        .as_array()
-        .ok_or_else(|| StreamDecodeError::new("commodity depth is not an array"))?;
-    if raw_depth.len() % 8 != 0 || raw_depth.len() > 800 {
-        return Err(StreamDecodeError::new("commodity depth shape is invalid"));
+    let raw_depth = &values[22..];
+    if raw_depth.len() > 100 {
+        return Err(StreamDecodeError::new("too many commodity depth rows"));
     }
-    let mut levels = Vec::new();
-    for row in raw_depth.chunks(8) {
+    let mut levels = Vec::with_capacity(raw_depth.len());
+    for row in raw_depth {
+        let row = row.as_array().filter(|row| row.len() == 8).ok_or_else(|| {
+            StreamDecodeError::new("commodity depth row must contain eight fields")
+        })?;
         levels.push(depth_level(
             money(&row[1])?,
             count(&row[0])?,
@@ -236,6 +247,8 @@ pub fn decode_candle(value: &str) -> Result<StreamEvent, StreamDecodeError> {
         9 => CandleParts {
             exchange,
             stock_code,
+            expiry_date: None,
+            datetime: fields[7].to_owned(),
             low: parse_money(fields[2])?,
             high: parse_money(fields[3])?,
             open: parse_money(fields[4])?,
@@ -249,6 +262,8 @@ pub fn decode_candle(value: &str) -> Result<StreamEvent, StreamDecodeError> {
         13 => CandleParts {
             exchange,
             stock_code,
+            expiry_date: Some(fields[2].to_owned()),
+            datetime: fields[11].to_owned(),
             strike: Some(parse_money(fields[3])?),
             right: OptionRight::from_wire(fields[4]),
             low: parse_money(fields[5])?,
@@ -262,6 +277,8 @@ pub fn decode_candle(value: &str) -> Result<StreamEvent, StreamDecodeError> {
         11 => CandleParts {
             exchange,
             stock_code,
+            expiry_date: Some(fields[2].to_owned()),
+            datetime: fields[9].to_owned(),
             low: parse_money(fields[3])?,
             high: parse_money(fields[4])?,
             open: parse_money(fields[5])?,
@@ -277,7 +294,7 @@ pub fn decode_candle(value: &str) -> Result<StreamEvent, StreamDecodeError> {
     if fields.len() == 13 && parts.right.is_none() {
         return Err(StreamDecodeError::new("option candle right is invalid"));
     }
-    Ok(StreamEvent::Candle(candle(parts)))
+    Ok(StreamEvent::Candle(candle(parts, value.to_owned())))
 }
 
 fn exchange_from_qualifier(value: u16) -> Result<Exchange, StreamDecodeError> {
@@ -285,6 +302,8 @@ fn exchange_from_qualifier(value: u16) -> Result<Exchange, StreamDecodeError> {
         1 => Ok(Exchange::Bse),
         4 => Ok(Exchange::Nse),
         6 => Ok(Exchange::Mcx),
+        8 => Ok(Exchange::Bfo),
+        13 => Ok(Exchange::Ndx),
         _ => Err(StreamDecodeError::new("unknown exchange qualifier")),
     }
 }

@@ -53,7 +53,7 @@
     "base": "rest_v1",
     "path": "/order",
     "auth": "signed_v1",
-    "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"action\":\"buy\",\"order_type\":\"limit\",\"quantity\":\"1\",\"price\":\"420.00\",\"validity\":\"day\",\"user_remark\":\"rustsdk\"}"
+    "body": "{\"stock_code\":\"ITC\",\"exchange_code\":\"NSE\",\"product\":\"cash\",\"action\":\"buy\",\"order_type\":\"limit\",\"quantity\":\"1\",\"price\":\"420.00\",\"validity\":\"day\",\"settlement_id\":\"\",\"order_segment_code\":\"\",\"lots\":\"\",\"user_remark\":\"rustsdk\"}"
   },
   "orders.detail": {
     "method": "GET",
@@ -116,7 +116,7 @@
     "base": "rest_v1",
     "path": "/squareoff",
     "auth": "signed_v1",
-    "body": "{\"source_flag\":\"\",\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"quantity\":\"75\",\"price\":\"6.00\",\"action\":\"sell\",\"order_type\":\"limit\",\"validity\":\"day\",\"stoploss_price\":\"\",\"disclosed_quantity\":\"0\",\"protection_percentage\":\"\",\"settlement_id\":\"\",\"margin_amount\":\"\",\"open_quantity\":\"75\",\"cover_quantity\":\"\",\"product_type\":\"options\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"alias_name\":\"\",\"trade_password\":\"\"}"
+    "body": "{\"source_flag\":\"\",\"stock_code\":\"NIFTY\",\"exchange_code\":\"NFO\",\"quantity\":\"75\",\"price\":\"6.00\",\"action\":\"sell\",\"order_type\":\"limit\",\"validity\":\"day\",\"stoploss_price\":\"\",\"disclosed_quantity\":\"0\",\"protection_percentage\":\"\",\"settlement_id\":\"\",\"margin_amount\":\"\",\"open_quantity\":\"75\",\"cover_quantity\":\"\",\"product_type\":\"options\",\"expiry_date\":\"2025-02-27T00:00:00.000Z\",\"right\":\"call\",\"strike_price\":\"24000\",\"validity_date\":\"\",\"alias_name\":\"\",\"trade_password\":\"\",\"order_reference\":\"\",\"position_exchange_code\":\"\",\"lots\":\"\"}"
   },
   "trades.list": {
     "method": "GET",

@@ -79,7 +79,7 @@ program covers all six combinations.
 Set:
 
 - `BREEZE_HISTORICAL_API` to `v1` or `v2`;
-- `BREEZE_INTERVAL` to `minute`, `1minute`, `day`, or `1day`;
+- `BREEZE_INTERVAL` to `1second` (v2 only), `minute`, `1minute`, `5minute`, `30minute`, `day`, or `1day`;
 - `BREEZE_FROM` and `BREEZE_TO` to RFC 3339 timestamps.
 
 Then write the normalized bars to a CSV file:
@@ -100,9 +100,9 @@ cargo run --example market_data -- quotes
 cargo run --example market_data -- option-chain
 ```
 
-`option-chain` requires `BREEZE_PRODUCT=options` and uses the complete typed
-option identity. This is stricter than the Python call and prevents an
-incomplete/non-option instrument from reaching ICICI.
+`option-chain` accepts `BREEZE_PRODUCT=options` or `futures` on NFO/BFO.
+Options use the complete typed option identity; futures send their expiry
+without an option right or strike.
 
 ## Account and portfolio reads
 
@@ -142,18 +142,19 @@ The margin calculator requires an instrument plus `BREEZE_ACTION`,
 cargo run --example risk_calculators -- margin
 ```
 
-The limit-price calculator additionally requires
-`BREEZE_STOP_LOSS_TRIGGER`, `BREEZE_SOURCE_FLAG` (`P` or `O`),
-`BREEZE_LIMIT_RATE`, `BREEZE_ORDER_ID`, `BREEZE_AVAILABLE_QUANTITY`, and
-`BREEZE_FRESH_ORDER_LIMIT`:
+The limit-price calculator requires the instrument and action plus
+`BREEZE_STOP_LOSS_TRIGGER`, `BREEZE_SOURCE_FLAG` (`P`, `M`, or `O`),
+and `BREEZE_FRESH_ORDER_LIMIT`:
 
 ```console
 cargo run --example risk_calculators -- limit-price
 ```
 
-Unlike the Python example's empty strings, version 0.0.2 requires a non-empty
-order reference and positive available quantity. This known modeling limitation
-is not hidden by substituting invented values.
+`BREEZE_LIMIT_RATE`, `BREEZE_ORDER_ID`, and `BREEZE_AVAILABLE_QUANTITY` are
+optional. An absent value sends the documented empty string. Available quantity
+also accepts zero; this does not change the positive-quantity requirement on orders.
+The example infers a nonempty product from the instrument, matching SDK validation.
+The conflicting reference-page blank product is not accepted.
 
 ## Streaming
 

@@ -120,7 +120,33 @@ fn option_chain_requires_two_of_expiry_right_and_strike() {
 }
 
 #[test]
-fn option_chain_instrument_conversion_accepts_only_supported_options() {
+fn futures_option_chain_accepts_optional_expiry_and_rejects_option_filters() {
+    let base = || OptionChainRequest::futures(DerivativeExchange::Nfo, stock("NIFTY"));
+    assert!(base().build().is_ok());
+    assert!(
+        base()
+            .expiry(date("2025-02-27"))
+            .right(OptionRight::Call)
+            .build()
+            .is_err()
+    );
+    assert!(
+        base()
+            .expiry(date("2025-02-27"))
+            .strike(money("24000"))
+            .build()
+            .is_err()
+    );
+    assert!(
+        OptionChainRequest::futures(DerivativeExchange::Mcx, stock("GOLD"))
+            .expiry(date("2025-02-27"))
+            .build()
+            .is_err()
+    );
+}
+
+#[test]
+fn option_chain_instrument_conversion_accepts_supported_derivatives() {
     assert!(OptionChainRequest::try_from(option()).is_ok());
     let bfo_option = breeze_icici::domain::Instrument::option(
         DerivativeExchange::Bfo,
@@ -132,7 +158,7 @@ fn option_chain_instrument_conversion_accepts_only_supported_options() {
     .unwrap();
     assert!(OptionChainRequest::try_from(bfo_option).is_ok());
     assert!(OptionChainRequest::try_from(equity()).is_err());
-    assert!(OptionChainRequest::try_from(future()).is_err());
+    assert!(OptionChainRequest::try_from(future()).is_ok());
 
     let mcx_option = breeze_icici::domain::Instrument::option(
         DerivativeExchange::Mcx,
@@ -154,6 +180,58 @@ fn market_and_prohibited_margin_products_are_not_request_values() {
     assert_eq!(
         OrderType::from_str("stoploss").unwrap(),
         OrderType::StopLoss
+    );
+}
+
+#[test]
+fn api_review_documented_btst_and_mtf_products_are_known() {
+    assert!(Product::from_str("btst").is_ok());
+    assert!(Product::from_str("mtf").is_ok());
+}
+
+#[test]
+fn api_review_product_selection_is_validated_per_operation_and_instrument() {
+    assert!(
+        PlaceOrderRequest::limit(equity(), Action::Buy, quantity(1), money("420"))
+            .product(Product::Btst)
+            .validity(Validity::Day)
+            .build()
+            .is_ok()
+    );
+    for (instrument, product) in [
+        (equity(), Product::Mtf),
+        (equity(), Product::Options),
+        (option(), Product::Btst),
+    ] {
+        assert!(
+            PlaceOrderRequest::limit(instrument, Action::Buy, quantity(1), money("420"))
+                .product(product)
+                .validity(Validity::Day)
+                .build()
+                .is_err()
+        );
+    }
+    assert!(
+        breeze_icici::orders::PreviewOrderRequest::limit(
+            option(),
+            Action::Buy,
+            quantity(75),
+            money("6")
+        )
+        .product(Product::Mtf)
+        .build()
+        .is_err()
+    );
+    assert!(
+        breeze_icici::orders::PreviewOrderRequest::limit(
+            equity(),
+            Action::Buy,
+            quantity(1),
+            money("420")
+        )
+        .order_type(OrderType::StopLoss)
+        .build()
+        .is_ok()
     );
 }
 

@@ -99,15 +99,34 @@ The `trading()` name is an attention boundary, not a permissions system. Broker/
 `Instrument` has private representation and validated `equity`, `future`, and `option` constructors. Cash instruments cannot acquire expiry/right/strike fields, which is also enforced by a compile-fail contract. Standalone endpoint filters use the known `Exchange` values; broker/account availability is still an API concern and is not inferred as a client-side permission.
 
 - `Money` uses `rust_decimal::Decimal` and emits non-exponent decimal strings.
+  JSON numbers retain their lexical precision through the envelope using
+  `serde_json/arbitrary_precision`; unrepresentable values fail decoding.
 - `Quantity` is a positive integer; response-only counts can represent zero.
+- Calculator counts also accept zero. Absent limit rate, order reference, and
+  available quantity serialize as documented empty strings. Product defaults to
+  the instrument's product and cannot be empty, matching SDK validation.
 - IDs remain opaque strings even when examples are numeric.
 - `DateRange` validates ordering and endpoint-specific historical windows.
 - `StockCode` trims, uppercases, and validates the documented ASCII shape.
 - Unknown order statuses and selected upstream text values are retained as unknown, never mapped to a known terminal state.
 
-Request fields are private and built through constructors/builders. The public order model contains limit and explicit stop-loss orders; it has no market-order variant. Stop-loss constructors validate the buy/sell limit-to-trigger relationship before I/O. The documented GTT surface includes typed single-leg and cover-OCO constructors; the SDK-only plain `oco` spelling is not inferred into the page contract.
+Request fields are private and built through constructors/builders. The public order model contains limit and explicit stop-loss orders; it has no market-order variant. Stop-loss constructors validate the buy/sell limit-to-trigger relationship before I/O. The documented GTT surface includes typed single-leg and cover-OCO constructors for futures/options; futures send `right: "others"` and `strike_price: "0"`. The SDK-only plain `oco` spelling is not inferred into the page contract.
 
-`OptionChainRequest` implements fallible conversion from owned or borrowed `Instrument` values. Conversion accepts only option instruments on NFO or BFO, and the builder independently enforces those exchanges plus the documented two-of-three contract-filter rule. Unsupported instruments fail before signing or transport rather than being rewritten to another exchange.
+Order and preview product selectors are separate from instrument identity.
+Equity placement accepts cash or BTST. Read-only previews additionally accept
+MTF, an explicit limit/stop-loss order type, and N/S flags. An unset flag sends
+the SDK's empty value; a read-only preview may omit its trigger.
+Incompatible instrument/product pairs and MTF placement fail before I/O.
+Margin positions omit cover fields by default. Enabling the cover group uses
+N/zero for unspecified fields; these calculator inputs do not add a trading mutation product.
+
+`OptionChainRequest` implements fallible conversion from owned or borrowed
+future/option `Instrument` values on NFO or BFO. Options enforce the two-of-three
+contract-filter rule; the futures builder accepts optional expiry and excludes option
+right/strike filters. Cash and unsupported exchanges fail before signing or transport.
+Historical intervals include 1/5/30 minutes and one day, plus one second on v2.
+V1 rejects one-second history and BSE/BFO, matching the SDK. Trade lists offer
+bounded dates or the unbounded `all(exchange)` form.
 
 ## Authentication and wire protocols
 
@@ -129,7 +148,16 @@ No layer reserializes a signed body, and callers cannot inject signing headers.
 
 ### Historical v2
 
-Historical v2 is a separate query/header protocol. It sends the documented query keys, including `exch_code`, with `X-SessionToken` and `apikey`; it has no v1 body signature.
+Historical v2 is a separate query/header protocol. It sends the documented query keys, including `exch_code`, with `X-SessionToken`, `apikey`, and JSON content type; it has no v1 body signature.
+
+### SDK compatibility
+
+The [pinned SDK contract](SDK_COMPATIBILITY.md) defines defaults and omissions
+for supported existing requests. Placement sends routing metadata and an empty
+remark when unset; square-off sends the SDK's empty legacy metadata. The modify
+facade reads current state before its single write. Public `execute(request)`
+is the lower-level direct dispatch and deliberately skips facade workflow checks.
+Neither path automatically retries a write.
 
 ### Stream credentials
 
@@ -180,6 +208,11 @@ The production adapter maintains desired subscription state, reconnects with bou
 
 Events are decoded by pure, bounds-checked codecs. One Click Equity consumes the maintained SDK's raw 19-position list, and OHLCV codecs map the documented low/high/open/close positions explicitly for all three layouts. Unknown well-formed data is returned as `StreamEvent::Unknown`; malformed data returns `StreamError::Decode` without panicking or closing the stream. The channel is bounded. Overflow becomes `LaggedRequiresReconciliation`, especially important for orders. `wait_until_reconnected_for` gives callers a bounded wait.
 
+Candles retain the broker-local timestamp, optional derivative expiry, and the
+original CSV frame. Commodity depth consumes every eight-field row after the
+22-field prefix. Currency/BFO quotes and depth use their exchange qualifiers;
+the shared NSE/NFO quote qualifier is distinguished by its positional layout.
+
 The production adapter is compile-tested and fake-transport tested, not live-handshake qualified. `rust_socketio` 0.6 currently brings native TLS/OpenSSL independently of the REST TLS selection.
 
 ## Security masters
@@ -201,4 +234,4 @@ The mutual-fund archive is recognized, but its schema does not produce the same 
 
 Changing exact serialization, validation meaning, default retry/rate/deadline policy, or error categorization is semver-significant. Adding response accessors or preserved unknown values can be additive. Public request fields remain private so upstream additions can be incorporated without exposing invalid struct literals.
 
-Preview version `0.0.2` is an Apache-2.0 experimental release. Registry availability deliberately remains separate from a stable or production-readiness claim. MSRV, dependency policy, remaining contract hardening, live read-only compatibility, CI, and independent review are qualification gates described in `IMPLEMENTATION_PLAN.md`.
+Preview version `0.0.3` is an Apache-2.0 experimental release. Registry availability deliberately remains separate from a stable or production-readiness claim. MSRV, dependency policy, remaining contract hardening, live read-only compatibility, CI, and independent review are qualification gates described in `IMPLEMENTATION_PLAN.md`.

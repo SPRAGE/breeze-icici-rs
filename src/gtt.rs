@@ -6,7 +6,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 use crate::EndpointRequest;
-use crate::domain::{DateRange, Instrument, Money, Quantity, expiry_timestamp};
+use crate::domain::{DateRange, Exchange, Instrument, Money, Quantity, expiry_timestamp};
 use crate::error::{Error, ValidationError};
 use crate::orders::Action;
 use crate::rate_limit::RequestClass;
@@ -211,13 +211,6 @@ impl GttOrderBuilder {
                 "GTT orders require a derivative instrument",
             ));
         }
-        if matches!(&self.0.kind, GttOrderKind::CoverOco { .. })
-            && self.0.instrument.right().is_none()
-        {
-            return Err(ValidationError::new(
-                "cover OCO requires an option instrument",
-            ));
-        }
         if self.0.index_kind.is_none() || self.0.trade_date.is_none() {
             return Err(ValidationError::new(
                 "index kind and trade date are required",
@@ -338,14 +331,16 @@ impl EndpointRequest for GttOrderRequest {
                     product: self.instrument.product().wire(),
                     quantity: self.quantity.get().to_string(),
                     expiry_date: expiry_timestamp(
-                        self.instrument.expiry().expect("validated option"),
+                        self.instrument.expiry().expect("validated derivative"),
                     ),
-                    right: self.instrument.right().expect("validated option").wire(),
+                    right: self
+                        .instrument
+                        .right()
+                        .map_or("others", |right| right.wire()),
                     strike_price: self
                         .instrument
                         .strike()
-                        .expect("validated option")
-                        .to_wire_string(),
+                        .map_or_else(|| "0".to_owned(), Money::to_wire_string),
                     gtt_type: "cover_oco",
                     fresh_order_action: fresh.action.wire(),
                     fresh_order_price: fresh.price.to_wire_string(),
@@ -361,11 +356,19 @@ impl EndpointRequest for GttOrderRequest {
 
 #[derive(Clone, Debug)]
 pub struct GttOrderListRequest {
+    exchange: Exchange,
     range: DateRange,
 }
 impl GttOrderListRequest {
     pub fn new(range: DateRange) -> Result<Self, ValidationError> {
-        Ok(Self { range })
+        Ok(Self {
+            range,
+            exchange: Exchange::Nfo,
+        })
+    }
+    pub fn exchange(mut self, value: Exchange) -> Self {
+        self.exchange = value;
+        self
     }
 }
 
@@ -417,7 +420,7 @@ impl EndpointRequest for GttOrderListRequest {
             to_date: String,
         }
         compact_json(&Body {
-            exchange_code: "NFO",
+            exchange_code: self.exchange.wire(),
             from_date: self.range.start_wire(),
             to_date: self.range.end_wire(),
         })
@@ -426,11 +429,19 @@ impl EndpointRequest for GttOrderListRequest {
 
 #[derive(Clone, Debug)]
 pub struct CancelGttOrderRequest {
+    exchange: Exchange,
     order_id: GttOrderId,
 }
 impl CancelGttOrderRequest {
     pub fn new(order_id: GttOrderId) -> Self {
-        Self { order_id }
+        Self {
+            order_id,
+            exchange: Exchange::Nfo,
+        }
+    }
+    pub fn exchange(mut self, value: Exchange) -> Self {
+        self.exchange = value;
+        self
     }
 }
 
@@ -470,13 +481,14 @@ impl EndpointRequest for CancelGttOrderRequest {
         }
         compact_json(&Body {
             gtt_order_id: self.order_id.as_str(),
-            exchange_code: "NFO",
+            exchange_code: self.exchange.wire(),
         })
     }
 }
 
 #[derive(Clone, Debug)]
 pub struct ModifyGttOrderRequest {
+    exchange: Exchange,
     order_id: GttOrderId,
     kind: ModifyGttOrderKind,
 }
@@ -490,6 +502,7 @@ impl ModifyGttOrderRequest {
     pub fn single(order_id: GttOrderId, leg: GttLeg) -> Self {
         Self {
             order_id,
+            exchange: Exchange::Nfo,
             kind: ModifyGttOrderKind::Single(leg),
         }
     }
@@ -497,8 +510,13 @@ impl ModifyGttOrderRequest {
     pub fn cover_oco(order_id: GttOrderId, legs: GttLegSet) -> Self {
         Self {
             order_id,
+            exchange: Exchange::Nfo,
             kind: ModifyGttOrderKind::CoverOco(legs),
         }
+    }
+    pub fn exchange(mut self, value: Exchange) -> Self {
+        self.exchange = value;
+        self
     }
 }
 impl EndpointRequest for ModifyGttOrderRequest {
@@ -528,7 +546,7 @@ impl EndpointRequest for ModifyGttOrderRequest {
             ModifyGttOrderKind::CoverOco(legs) => ("cover_oco", wire_legs(legs)),
         };
         compact_json(&Body {
-            exchange_code: "NFO",
+            exchange_code: self.exchange.wire(),
             gtt_order_id: self.order_id.as_str(),
             gtt_type,
             order_details,

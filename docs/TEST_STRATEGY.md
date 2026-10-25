@@ -6,11 +6,15 @@ The repository has two explicit contract entry points:
 
 | Command | Current local result | Purpose |
 |---|---|---|
-| `cargo test --test fixture_corpus` | 8 passing tests | Validates the source inventory, 27 REST/five stream fixture corpus, required documents, example inventory/safety boundary, and synthetic-data boundary. |
-| `cargo test --features sdk-contract --test sdk_contract` | 101 passing tests | Exercises the public API, exact wires, models, HTTP behavior, rate limits, stream codecs/lifecycle, parser, and compile-fail safety boundaries. |
+| `cargo test --test fixture_corpus` | 9 tests | Validates the source inventory, 27 REST/five stream fixture corpus, required documents, example inventory/safety boundary, and synthetic-data boundary. |
+| `cargo test --features sdk-contract --test sdk_contract` | 125 tests | Exercises the public API, exact wires, models, HTTP behavior, rate limits, stream codecs/lifecycle, parser, and compile-fail safety boundaries. |
 | `cargo check --all-features --examples` | 8 example targets compile | Type-checks authentication, read-only REST, streaming, and offline mutation-construction usage against the public API. |
 
-The five Trybuild cases have reviewed `.stderr` goldens. They fail for their intended reason: credentials are not serializable, pending clients cannot trade, cash instruments cannot gain expiry fields, market orders are not constructible, and downstream crates cannot implement the sealed signed-request contract.
+The seven Trybuild cases have reviewed `.stderr` goldens. They fail for their
+intended reason: credentials/session tokens are not serializable, session tokens
+have no Display implementation, pending clients cannot trade, cash instruments
+cannot gain expiry fields, market orders are not constructible, and downstream
+crates cannot implement the sealed signed-request contract.
 
 All normal tests are hermetic. Wiremock tests bind only loopback ports and never contact ICICI. No test has live credentials, changes funds, sends a trade, or opens a production feed.
 
@@ -24,6 +28,7 @@ All normal tests are hermetic. Wiremock tests bind only loopback ports and never
 | Downstream code invents a signed request or wrong retry class | Sealed-trait compile-fail test | `tests/ui/custom_endpoint_request_is_sealed.rs` |
 | Stop-loss semantics or wire fields drift | Validation plus exact wire | `contract/validation.rs`, `contract/rest_wire.rs` |
 | Numeric strings/nulls corrupt values | Fixture/model decoding | `contract/responses.rs` |
+| JSON numeric money loses precision inside an envelope | Raw numeric response literals, exponents, and overflow/underflow cases | `contract/responses.rs` |
 | Unknown upstream status gains a false meaning | Forward-compatibility decoding | `contract/responses.rs` |
 | Wrong method/path/header/body | One prepared-request contract per operation | `contract/rest_wire.rs` |
 | Derivative identity is omitted or reordered | Exact quote and historical-v1 variant bodies | `contract/rest_wire.rs` |
@@ -33,6 +38,8 @@ All normal tests are hermetic. Wiremock tests bind only loopback ports and never
 | Deadline excludes limiter/retry waits | Paused-time and loopback deadline tests | `contract/transport.rs` |
 | Client exceeds configured local gates | Paused-time model tests | `contract/rate_limit.rs` |
 | Positional stream fields are swapped or pre-normalized | Distinct-value raw frame fixtures | `contract/streaming.rs`, `fixtures/stream_frames.json` |
+| Time/expiry, later commodity levels, or exchange identity are lost | Distinct contracts/times, multi-row depth, and NDX/BFO frames | `contract/streaming.rs` |
+| Documented variants cannot be expressed | Futures chains/GTT, intervals, calculator blanks/zero/cover fields, products and preview selectors | `contract/rest_wire.rs`, `contract/validation.rs` |
 | Malformed stream data panics | Table and bounded property tests | `contract/streaming.rs` |
 | Reconnect loses/duplicates desired state | Deterministic fake Socket.IO | `contract/streaming.rs` |
 | Stream memory growth or silent loss | Capacity/lag tests | `contract/streaming.rs` |

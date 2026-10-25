@@ -91,6 +91,57 @@ fn documented_number_and_numeric_string_shapes_map_to_decimal_values() {
 }
 
 #[test]
+fn api_review_numeric_money_is_exact_through_the_response_envelope() {
+    for value in [
+        "123456789.123456789",
+        "-123456789.123456789",
+        "0.0000000000000000000000000001",
+    ] {
+        let body = format!(
+            r#"{{"Success":[{{"stock_code":"ITC","exchange_code":"NSE","ltp":{value}}}],"Status":200,"Error":null}}"#
+        );
+        let quotes =
+            decode_response(&quote(), StatusCode::OK, &HeaderMap::new(), body.as_bytes()).unwrap();
+        assert_eq!(quotes[0].last_price().to_string(), value);
+    }
+}
+
+#[test]
+fn api_review_numeric_money_handles_json_exponents_and_rejects_rounding() {
+    let decode = |number: &str| {
+        let body = format!(
+            r#"{{"Success":[{{"stock_code":"ITC","exchange_code":"NSE","ltp":{number}}}],"Status":200,"Error":null}}"#
+        );
+        decode_response(&quote(), StatusCode::OK, &HeaderMap::new(), body.as_bytes())
+    };
+    for (number, expected) in [
+        ("1e-28", "0.0000000000000000000000000001"),
+        ("1.2345e2", "123.45"),
+        ("1e+3", "1000"),
+        (
+            "79228162514264337593543950335",
+            "79228162514264337593543950335",
+        ),
+    ] {
+        assert_eq!(
+            decode(number).unwrap()[0].last_price().to_string(),
+            expected
+        );
+    }
+    for number in [
+        "1e-29",
+        "79228162514264337593543950336",
+        "1.23456789012345678901234567895e0",
+        "0.12345678901234567890123456789",
+    ] {
+        assert!(
+            decode(number).is_err(),
+            "{number} must fail instead of rounding"
+        );
+    }
+}
+
+#[test]
 fn null_and_empty_string_are_not_coerced_to_zero_without_field_evidence() {
     let orders = decode_response(
         &order_detail(),

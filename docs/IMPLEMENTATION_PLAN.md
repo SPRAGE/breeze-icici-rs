@@ -9,11 +9,11 @@ Crates.io distribution of this experimental preview is not the same as productio
 - no live Breeze credential or account was used;
 - no live Socket.IO handshake was attempted;
 - no funds or trading mutation was sent;
-- crates.io distribution of package `breeze-icici` version `0.0.2` is explicitly authorized but remains a separately workflow-controlled release action until executed;
+- crates.io distribution of package `breeze-icici` version `0.0.3` is explicitly authorized but remains a separately workflow-controlled release action until executed;
 - Apache-2.0 is the selected license, while stable semver and dependency policies remain open;
 - the declared Rust 1.85 MSRV still needs a real 1.85 toolchain run.
 
-`Cargo.toml` therefore enables publication only for experimental preview version `0.0.2`; distribution is not a live-compatibility or production claim.
+`Cargo.toml` therefore enables publication only for experimental preview version `0.0.3`; distribution is not a live-compatibility or production claim.
 
 ## Local definition of done
 
@@ -83,11 +83,11 @@ These actions require evidence or choices beyond local implementation and must r
 
 1. **MSRV:** run the complete relevant suite with Rust 1.85, then keep or raise `rust-version` from evidence.
 2. **Dependency policy:** choose license/vulnerability policy and add `cargo-deny`/audit configuration; review the native-TLS streaming dependency.
-3. **Public metadata:** crate name `breeze-icici`, Apache-2.0, repository URL, and preview version `0.0.2` are selected; a stable semver support policy remains open.
+3. **Public metadata:** crate name `breeze-icici`, Apache-2.0, repository URL, and preview version `0.0.3` are selected; a stable semver support policy remains open.
 4. **API review:** run an independent semver/public-surface review before any stable release.
 5. **CI:** GitHub Actions definitions now cover formatting, default/native/all-feature builds, tests, Clippy, docs, packaging, and published-library MSRV compilation. Hosted-run evidence, branch/tag rulesets, environment approval, and a dependency policy remain external activation and qualification steps.
 6. **Live read-only compatibility:** only with account-owner authorization, use secret injection and a strict allowlist to check CustomerDetails/read endpoints and stream handshakes; sanitize and bind the result to an immutable commit.
-7. **Publication:** `0.0.2` is explicitly authorized but remains separately workflow-controlled until executed; verify the registry artifact separately from source/build proof.
+7. **Publication:** `0.0.3` is explicitly authorized but remains separately workflow-controlled until executed; verify the registry artifact separately from source/build proof.
 
 Automated live funds/order/GTT/square-off mutations are not a release gate.
 
@@ -146,9 +146,25 @@ The run used Rust 1.97.1. Rust 1.85 remains a declared but unproven MSRV. The se
 
 ## Review gates
 
+The 0.0.3 API compliance correction adds regression cases for candle
+identity, commodity depth, currency/BFO exchanges, precise response numbers,
+historical intervals, futures chains and cover-OCO, calculator blanks/zero/cover
+fields, BTST placement, and BTST/MTF plus stop-loss/N/S previews. An independent
+review of this change preserved calculator product inference and removed an
+unsupported placement-price constraint from read-only previews. Subsequent SDK alignment removes the blank calculator product option, follows
+SDK defaults and validation for existing APIs, and records 44 captured SDK cases.
+No live compatibility or release qualification is implied.
+
 - Security review: secret formatting, redirect/header behavior, error redaction, response limits, and dependency TLS policy.
 - Mutation review: exact serialization, prohibited variants, rate classes, and no retry after possible write.
 - Protocol review: Socket.IO paths/auth/events, frame ambiguity, bounded reconnect, replay, and lag semantics.
 - Public API review: service discoverability, forward-compatible response values, feature combinations, and semver surface.
 
-Current local evidence includes inline security, mutation, protocol, and public-surface review. An independent review remains a release gate.
+Current local evidence includes security, mutation, protocol, and public-surface review. Independent review of the SDK compatibility changes completed with no remaining material findings. Stable and production qualification remain open.
+
+## SDK compatibility release evidence (2026-10-25)
+
+- Official SDK 1.0.68 is pinned to commit `4125106b48932ff99b45d593749dcec21c552558`, with 44 reproducible request captures covering the 27 existing REST operations and selected variants.
+- The final local all-feature suite passed 9 fixture tests, 125 contract tests, and one Rustdoc test. Capture freshness, formatting, Clippy with warnings denied, examples, Rustdoc with warnings denied, all four TLS/streaming combinations, and generated guidance checks passed.
+- The user explicitly authorized committing, pushing, tagging, and publishing preview version `0.0.3` through the existing workflow. Hosted CI, exact tag provenance, and the registry checksum must be verified as separate release evidence.
+- Rate-limit behavior is unchanged. No live broker requests or trading mutations were used as verification.

@@ -4,9 +4,13 @@
 
 The reviewed reference page contains 27 REST operation sections, five streaming families, and global contracts for login, signing, errors, instruments, limits, and regulatory restrictions. The table below accounts for every one of them.
 
-“Contract green” means one selected canonical request and normalized response shape pass the hermetic black-box suite. It does **not** mean every documented variant is implemented or that the behavior has been live-verified against the current broker service. See `KNOWN_LIMITATIONS.md` for the gaps known at version `0.0.2`.
+“Contract green” means one selected canonical request and normalized response shape pass the hermetic black-box suite. It does **not** mean every documented variant is implemented or that the behavior has been live-verified against the current broker service. See `KNOWN_LIMITATIONS.md` for the gaps known at version `0.0.3`.
 
 ## Global contracts
+
+The [SDK compatibility contract](SDK_COMPATIBILITY.md) adds 44 captured SDK
+cases across these existing REST APIs, including URL/header checks and the
+modification facade's current-order preflight. It does not add SDK-only endpoints.
 
 | Documentation section | Implemented Rust surface | Contract proof |
 |---|---|---|
@@ -50,6 +54,18 @@ The reviewed reference page contains 27 REST operation sections, five streaming 
 | 27 | GTTOrder / GTTModifyOrder | `PUT /gttorder` | `trading().modify_gtt(ModifyGttOrderRequest)` for documented single-leg/cover-OCO types | `gtt.modify` | Implemented, contract green |
 
 The option-chain path is deliberately lowercase in the selected contract. The documentation table shows `/OptionChain`, while its own links and ICICI's maintained SDK also use lowercase. See the audit for this and other resolutions.
+
+The unreleased variant contracts additionally exercise:
+
+- 5/30-minute history on both protocols and futures option-chain requests;
+- blank/zero/populated calculator fields and neutral/nonzero margin cover fields;
+- BTST placement, BTST/MTF previews, explicit stop-loss previews and N/S flags;
+- futures cover-OCO with the appropriate non-option identity fields;
+- exact numeric response money, including signed values and precision boundaries;
+- candle time/expiry/raw frames, multi-row commodity depth, and NDX/BFO exchange identity.
+
+These cases live in `tests/contract/rest_wire.rs`, `responses.rs`, `validation.rs`,
+and `streaming.rs`. Unsupported product/instrument combinations remain local errors.
 
 ## Example coverage
 

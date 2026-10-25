@@ -1,6 +1,6 @@
 [package]
 name = "breeze-icici"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2024"
 rust-version = "1.85"
 publish = true
@@ -15,6 +15,7 @@ include = [
     "/examples/**",
     "/tests/**",
     "/docs/**",
+    "/scripts/capture_sdk_contract.py",
     "/Cargo.toml",
     "/Cargo.lock",
     "/README.md",
@@ -87,7 +88,7 @@ reqwest = { version = "0.12", default-features = false }
 rust_socketio = { version = "0.6", features = ["async"], optional = true }
 rust_decimal = { version = "1", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["arbitrary_precision"] }
 sha2 = "0.10"
 thiserror = "2"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }

@@ -463,7 +463,10 @@ fn all_required_markdown_exists_and_declares_the_preview_release_boundary() {
     }
 
     let readme = fs::read_to_string(root.join("README.md")).expect("read README");
-    assert!(readme.contains("Version `0.0.2` is a source-only preview"));
+    assert!(readme.contains(&format!(
+        "Version `{}` is an experimental preview",
+        env!("CARGO_PKG_VERSION")
+    )));
     assert!(readme.contains("known limitations"));
     assert!(readme.contains("This codebase is AI-generated"));
     assert!(readme.contains("Registry distribution is for evaluation"));

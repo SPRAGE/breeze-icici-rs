@@ -4,7 +4,7 @@ use std::str::FromStr;
 
 use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal;
-use serde::de::{self, Visitor};
+use serde::de;
 use serde::{Deserialize, Deserializer};
 
 use crate::error::ValidationError;
@@ -101,37 +101,29 @@ impl FromStr for Money {
 
 impl<'de> Deserialize<'de> for Money {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        struct MoneyVisitor;
-        impl<'de> Visitor<'de> for MoneyVisitor {
-            type Value = Money;
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("a decimal string or JSON number")
-            }
-            fn visit_str<E: de::Error>(self, value: &str) -> Result<Self::Value, E> {
-                Money::from_str(value).map_err(E::custom)
-            }
-            fn visit_string<E: de::Error>(self, value: String) -> Result<Self::Value, E> {
-                self.visit_str(&value)
-            }
-            fn visit_i64<E: de::Error>(self, value: i64) -> Result<Self::Value, E> {
-                Money::from_str(&value.to_string()).map_err(E::custom)
-            }
-            fn visit_u64<E: de::Error>(self, value: u64) -> Result<Self::Value, E> {
-                Money::from_str(&value.to_string()).map_err(E::custom)
-            }
-            fn visit_f64<E: de::Error>(self, value: f64) -> Result<Self::Value, E> {
-                if !value.is_finite() {
-                    return Err(E::custom("non-finite decimal"));
-                }
-                let value = if value.fract() == 0.0 {
-                    format!("{value:.1}")
+        // `arbitrary_precision` also preserves number text in the intermediate
+        // response envelope, before this endpoint-specific decoder is called.
+        match serde_json::Value::deserialize(deserializer)? {
+            serde_json::Value::String(value) => Self::from_str(&value).map_err(de::Error::custom),
+            serde_json::Value::Number(value) => {
+                let text = value.to_string();
+                if text.contains(['e', 'E']) {
+                    // Decimal's scientific parser otherwise rounds an oversized
+                    // mantissa before applying the exponent.
+                    let mantissa = text.split(['e', 'E']).next().expect("numeric mantissa");
+                    Decimal::from_str_exact(mantissa)
+                        .map_err(|_| de::Error::custom("invalid decimal value"))?;
+                    Decimal::from_scientific(&text)
+                        .map(Self)
+                        .map_err(|_| de::Error::custom("invalid decimal value"))
                 } else {
-                    value.to_string()
-                };
-                Money::from_str(&value).map_err(E::custom)
+                    Self::from_str(&text).map_err(de::Error::custom)
+                }
             }
+            _ => Err(de::Error::custom(
+                "expected a decimal string or JSON number",
+            )),
         }
-        deserializer.deserialize_any(MoneyVisitor)
     }
 }
 
@@ -178,6 +170,12 @@ impl Count {
 
     pub fn get(self) -> u64 {
         self.0
+    }
+}
+
+impl From<Quantity> for Count {
+    fn from(value: Quantity) -> Self {
+        Self(value.get())
     }
 }
 
@@ -293,6 +291,8 @@ impl<'de> Deserialize<'de> for OptionRight {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Product {
     Cash,
+    Btst,
+    Mtf,
     Futures,
     Options,
 }
@@ -301,6 +301,8 @@ impl Product {
     pub(crate) fn wire(self) -> &'static str {
         match self {
             Self::Cash => "cash",
+            Self::Btst => "btst",
+            Self::Mtf => "mtf",
             Self::Futures => "futures",
             Self::Options => "options",
         }
@@ -312,6 +314,8 @@ impl FromStr for Product {
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value.to_ascii_lowercase().as_str() {
             "cash" => Ok(Self::Cash),
+            "btst" => Ok(Self::Btst),
+            "mtf" => Ok(Self::Mtf),
             "future" | "futures" => Ok(Self::Futures),
             "option" | "options" => Ok(Self::Options),
             _ => Err(ValidationError::new("unsupported product")),
@@ -321,21 +325,30 @@ impl FromStr for Product {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Interval {
+    OneSecond,
     OneMinute,
+    FiveMinutes,
+    ThirtyMinutes,
     OneDay,
 }
 
 impl Interval {
     pub(crate) fn v1_wire(self) -> &'static str {
         match self {
+            Self::OneSecond => "1second",
             Self::OneMinute => "minute",
+            Self::FiveMinutes => "5minute",
+            Self::ThirtyMinutes => "30minute",
             Self::OneDay => "day",
         }
     }
 
     pub(crate) fn v2_wire(self) -> &'static str {
         match self {
+            Self::OneSecond => "1second",
             Self::OneMinute => "1minute",
+            Self::FiveMinutes => "5minute",
+            Self::ThirtyMinutes => "30minute",
             Self::OneDay => "1day",
         }
     }
